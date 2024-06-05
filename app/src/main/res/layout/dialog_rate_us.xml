@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_rate_app"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:elevation="10dp"
+        android:src="@drawable/img_rate_app"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="50dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/shape_dialog_theme_mode"
+        app:layout_constraintTop_toTopOf="@id/gl_1">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="50dp" />
+
+        <TextView
+            android:id="@+id/tv_rate_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="@string/rate_text"
+            app:layout_constraintTop_toBottomOf="@id/gl_2" />
+
+        <RatingBar
+            android:id="@+id/rb_rate_us"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:progressDrawable="@drawable/selector_rating"
+            android:rating="0"
+            android:scaleX="2"
+            android:scaleY="2"
+            android:stepSize="1.0"
+            android:translationY="30dp"
+            app:layout_constraintEnd_toEndOf="@id/tv_rate_text"
+            app:layout_constraintStart_toStartOf="@id/tv_rate_text"
+            app:layout_constraintTop_toBottomOf="@id/tv_rate_text" />
+
+        <android.widget.Button
+            android:id="@+id/btn_maybe_later"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:background="#00000000"
+            android:text="@string/maybe_later"
+            android:textColor="@color/grey"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btn_rate_now"
+            app:layout_constraintTop_toBottomOf="@id/rb_rate_us" />
+
+        <android.widget.Button
+            android:id="@+id/btn_rate_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:background="#00000000"
+            android:text="@string/rate_now"
+            android:textColor="@color/skyblue"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rb_rate_us" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

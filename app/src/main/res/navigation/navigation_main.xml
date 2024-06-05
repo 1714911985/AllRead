@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/fg_main">
+
+
+    <fragment
+        android:id="@+id/fg_main"
+        android:name="com.example.allreader.fragment.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main">
+
+        <action
+            android:id="@+id/action_fg_main_to_changeLanguageFragment"
+            app:destination="@id/fg_language" />
+        <action
+            android:id="@+id/action_fg_main_to_searchFragment"
+            app:destination="@id/fg_search" />
+    </fragment>
+    <fragment
+        android:id="@+id/fg_language"
+        android:name="com.example.allreader.fragment.ChangeLanguageFragment"
+        android:label="fragment_change_language"
+        tools:layout="@layout/fragment_change_language" />
+    <fragment
+        android:id="@+id/fg_search"
+        android:name="com.example.allreader.fragment.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
+
+
+</navigation>

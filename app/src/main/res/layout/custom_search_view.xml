@@ -1,0 +1,25 @@
+<!-- res/layout/custom_search_view.xml -->
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/shape_search_view"
+    android:orientation="horizontal"
+    android:layout_marginEnd="10dp"
+    android:layout_marginStart="50dp"
+    android:gravity="center_vertical">
+
+    <EditText
+        android:id="@+id/editText_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="15sp"
+        android:background="@android:color/transparent"
+        android:paddingStart="13dp"
+        android:paddingEnd="13dp"
+        android:textColorHint="#808080"
+        android:textColor="#000000"
+        android:inputType="text" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

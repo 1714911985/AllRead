@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">All Reader</string>
+    <string name="navigation_drawer_open">open</string>
+    <string name="navigation_drawer_close">close</string>
+    <string name="theme_mode">Theme Mode</string>
+    <string name="language">Language</string>
+    <string name="evaluate_us">Rate Us</string>
+    <string name="analytical_applications">Share App</string>
+    <string name="recent">Recent</string>
+    <string name="favorite">Favorite</string>
+    <string name="all">ALL</string>
+    <string name="pdf">PDF</string>
+    <string name="document">DOC</string>
+    <string name="xls">XLS</string>
+    <string name="ppt">PPT</string>
+    <string name="txt">TXT</string>
+    <string name="other">Other</string>
+    <string name="change_language">Change Language</string>
+    <string name="China">China</string>
+    <string name="USA">USA</string>
+
+    <string name="nav_header_text">View and read all\ndocument files on your\nmobile</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="choose_theme_mode">Select Theme Mode</string>
+    <string name="auto_mode">Auto mode</string>
+    <string name="light_mode">Light mode</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="rate_text">We are a tiny team working very extremely to give you the best apps for free. Your 5-Star are better than anything in the world!</string>
+    <string name="maybe_later">MAYBE LATER</string>
+    <string name="rate_now">RATE NOW</string>
+    <string name="sorry_find_no_file">Sorry, no results found!</string>
+    <string name="file">file</string>
+</resources>

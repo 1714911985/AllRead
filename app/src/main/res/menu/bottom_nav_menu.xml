@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_theme_mode"
+        android:icon="@drawable/ic_dark_mode"
+        android:title="@string/theme_mode" />
+    <item
+        android:id="@+id/item_language"
+        android:icon="@drawable/icon_language"
+        android:title="@string/language" />
+    <item
+        android:id="@+id/item_evaluate_us"
+        android:icon="@drawable/ic_rate"
+        android:title="@string/evaluate_us" />
+    <item
+        android:id="@+id/item_analytical_applications"
+        android:icon="@drawable/ic_share"
+        android:title="@string/analytical_applications" />
+</menu>
