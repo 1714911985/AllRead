@@ -4,10 +4,14 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.MediaStore;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +21,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.allreader.utils.observer.ScreenshotObserver;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "PermanentChannel";
     private static final String Notification_Title = "All Reader";
+    private ScreenshotObserver screenshotObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
 
         createNotificationChannel();//创建通知渠道
         sendNotification();// 发送通知
+
+
+        // 注册截屏监听器
+        screenshotObserver = new ScreenshotObserver(this, new Handler(Looper.getMainLooper()));
+        ScreenshotObserver.registerScreenshotObserver(this);
+
+        // 创建通知渠道
+        createScreenshotNotificationChannel();
     }
 
     private void sendNotification() {
@@ -51,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 发送通知
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(NOTIFICATION_ID,build);
+        manager.notify(NOTIFICATION_ID, build);
 
     }
 
@@ -67,6 +81,21 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+    private void createScreenshotNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "channel_id";
+            String channelName = "截屏通知";
+            String channelDescription = "通知用户截屏操作";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
