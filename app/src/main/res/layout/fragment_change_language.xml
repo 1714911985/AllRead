@@ -22,6 +22,7 @@
         app:layout_constraintTop_toBottomOf="@id/tb_change_language">
 
         <com.example.allreader.utils.custom_view.RadioGroupView
+            android:id="@+id/rgv_change"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">

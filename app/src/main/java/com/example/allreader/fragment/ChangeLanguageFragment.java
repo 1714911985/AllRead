@@ -1,5 +1,7 @@
 package com.example.allreader.fragment;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,13 +16,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.allreader.MainActivity;
 import com.example.allreader.R;
 import com.example.allreader.utils.custom_view.CustomRadioItem;
+import com.example.allreader.utils.custom_view.RadioGroupView;
+import com.tencent.mmkv.MMKV;
+
+import java.util.Locale;
+import java.util.Objects;
 
 
 public class ChangeLanguageFragment extends Fragment {
     private Toolbar tbChangeLanguage;
     private CustomRadioItem criChinese, criEnglish;
+    private RadioGroupView rgvChange;
+    private MMKV mmkv;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,13 +45,38 @@ public class ChangeLanguageFragment extends Fragment {
         tbChangeLanguage = view.findViewById(R.id.tb_change_language);
         criChinese = view.findViewById(R.id.cri_chinese);
         criEnglish = view.findViewById(R.id.cri_english);
+        rgvChange = view.findViewById(R.id.rgv_change);
+        MMKV.initialize(requireActivity());
+        mmkv = MMKV.defaultMMKV();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarButton();//设置toolbar的返回和确认按钮
+        setCheckedCustomRadioItem();
 
+    }
+
+    private void setCheckedCustomRadioItem() {
+        String language = mmkv.decodeString("language", "zh");
+        switch (language) {
+            case "zh":
+                criChinese.setChecked(true);
+                rgvChange.check(criChinese);
+                criChinese.performClick();
+                break;
+            case "en":
+                criEnglish.setChecked(true);
+                rgvChange.check(criEnglish);
+                criEnglish.performClick();
+                break;
+            default:
+                criChinese.setChecked(true);
+                rgvChange.check(criChinese);
+                criChinese.performClick();
+                break;
+        }
     }
 
     private void setToolbarButton() {
@@ -59,11 +94,32 @@ public class ChangeLanguageFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.item_confirm) {
                     //切换语言的逻辑
-
+                    changeLanguage();
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    private void changeLanguage() {
+        if (criChinese.isChecked()) {
+            setLanguage("zh", "CN");
+        } else if (criEnglish.isChecked()) {
+            setLanguage("en", "GB");
+        }
+    }
+
+    private void setLanguage(String language, String country) {
+        Locale locale = new Locale(language, country);
+
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+
+        Intent refresh = new Intent(getActivity(), MainActivity.class);
+        mmkv.encode("language", language);
+        startActivity(refresh);
+        requireActivity().finish();
     }
 }
