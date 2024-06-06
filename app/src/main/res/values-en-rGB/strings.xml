@@ -36,4 +36,8 @@
     <string name="screenshotNotification">Screenshot Notification</string>
     <string name="screenshotNotificationText">You have taken a screenshot</string>
     <string name="thankForYourRate">Thanks for your review !</string>
+    <string name="needAllFilePermission">Need All File Permission</string>
+    <string name="toAuthorize">Authorize</string>
+    <string name="needStoragePermission">Need Storage Permission</string>
+    <string name="hasNoPermission">No Permission</string>
 </resources>

@@ -1,22 +1,35 @@
 package com.example.allreader;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -30,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "PermanentChannel";
     private static final String Notification_Title = "All Reader";
     private ScreenshotObserver screenshotObserver;
+    private AlertDialog goSettingDialog;
+    public static final int REQUEST_WRITE_EXTERNAL_STORAGE = 12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +62,10 @@ public class MainActivity extends AppCompatActivity {
 
         // 创建通知渠道
         createScreenshotNotificationChannel();
+
+        checkAndRequestPermissionThenScan();
     }
+
 
     private void sendNotification() {
         // 设置点击通知后的操作
@@ -96,11 +114,95 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void checkAndRequestPermissionThenScan() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            checkAndRequestAllFilePermission();
+        } else {
+            checkAndRequestStoragePermission();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private void checkAndRequestAllFilePermission() {
+        if (Environment.isExternalStorageManager()) {
+            startScan();
+        } else {
+            setGoSettingDialog(this, getResources().getText(R.string.needAllFilePermission).toString(), Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+
+    private void checkAndRequestStoragePermission() {
+        try {
+            if (checkStoragePermission()) {
+                startScan();
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_WRITE_EXTERNAL_STORAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean checkStoragePermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.cancelAll();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_WRITE_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startScan();
+                } else {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        Toast.makeText(this, getResources().getText(R.string.hasNoPermission), Toast.LENGTH_SHORT).show();
+                    } else {
+                        setGoSettingDialog(this, getResources().getText(R.string.needStoragePermission).toString(), Settings.ACTION_APPLICATION_DETAILS_SETTINGS, requestCode);
+                    }
+                }
+        }
     }
+
+    private void setGoSettingDialog(Context context, String title, String action, int requestCode) {
+        if (goSettingDialog == null) {
+            goSettingDialog = new AlertDialog.Builder(context)
+                    .setTitle(title)
+                    .setPositiveButton(getResources().getText(R.string.toAuthorize), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Uri uri = Uri.parse("package:" + getPackageName());
+                            Intent intent = new Intent(action, uri);
+                            startActivityForResult(intent, requestCode);
+                        }
+                    }).create();
+        }
+        goSettingDialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (!Environment.isExternalStorageManager()) {
+                    Toast.makeText(this, getResources().getText(R.string.hasNoPermission), Toast.LENGTH_SHORT).show();
+                } else {
+                    startScan();
+                }
+            } else {
+                checkAndRequestStoragePermission();
+            }
+        }
+    }
+
+    private void startScan() {
+
+    }
+
+
 }

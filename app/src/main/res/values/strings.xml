@@ -34,4 +34,8 @@
     <string name="screenshotNotification">截屏通知</string>
     <string name="screenshotNotificationText">您进行了截屏操作</string>
     <string name="thankForYourRate">感谢您的评价！</string>
+    <string name="needAllFilePermission">需要所有文件权限</string>
+    <string name="toAuthorize">授权</string>
+    <string name="needStoragePermission">需要存储权限</string>
+    <string name="hasNoPermission">没有权限</string>
 </resources>
