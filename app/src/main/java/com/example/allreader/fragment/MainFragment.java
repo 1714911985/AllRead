@@ -10,10 +10,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements View.OnClickListener {
     private DrawerLayout dlyMain;
     private Toolbar tbMain;
     private GridView gvClassification;
@@ -50,7 +53,8 @@ public class MainFragment extends Fragment {
     private ViewPager2 vp2Collect;
     private NavigationView ngvDrawer;
     private NavController navController;
-    private Dialog dlThemeMode;
+    private Dialog dlThemeMode, dlRateUs;
+    private Button btnMaybeLater, btnRateNow;
     private MMKV mmkv;
     private static final String appPackageName = "com.example.allreader";
     //分享的URL   谷歌应用商城链接+包名
@@ -205,43 +209,46 @@ public class MainFragment extends Fragment {
 
 
     private void setAndShowRateUsDialog() {
-        final Dialog dialog = new Dialog(requireActivity(), R.style.CustomDialogTheme);
-        dialog.setContentView(R.layout.dialog_rate_us);
-        Window window = dialog.getWindow();
+        dlRateUs = new Dialog(requireActivity(), R.style.CustomDialogTheme);
+        dlRateUs.setContentView(R.layout.dialog_rate_us);
+        Window window = dlRateUs.getWindow();
         //设置dialog的大小
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         window.setWindowAnimations(R.style.DialogAnimation);
-        dialog.show();
+        dlRateUs.show();
 
+        btnMaybeLater = dlRateUs.findViewById(R.id.btn_maybe_later);
+        btnRateNow = dlRateUs.findViewById(R.id.btn_rate_now);
+        btnMaybeLater.setOnClickListener(this);
+        btnRateNow.setOnClickListener(this);
         dlyMain.close();
     }
 
     private void setAndShowChangeThemeModeDialog() {
         //                                                  设置dialog自带的背景框为透明
-        final Dialog dialog = new Dialog(requireActivity(), R.style.CustomDialogTheme);
-        dialog.setContentView(R.layout.dialog_theme_mode);
-        Window window = dialog.getWindow();
+        dlThemeMode = new Dialog(requireActivity(), R.style.CustomDialogTheme);
+        dlThemeMode.setContentView(R.layout.dialog_theme_mode);
+        Window window = dlThemeMode.getWindow();
         //设置dialog的大小
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         window.setWindowAnimations(R.style.DialogAnimation);
-        dialog.show();
+        dlThemeMode.show();
 
         dlyMain.close();
-        dlThemeMode = dialog;
 
         //设置默认选中的模式
         int mode = mmkv.decodeInt("mode", AppCompatDelegate.MODE_NIGHT_NO);
         switch (mode) {
             case AppCompatDelegate.MODE_NIGHT_NO:
-                RadioButton rbLightMode = dialog.findViewById(R.id.rb_light_mode);
+                RadioButton rbLightMode = dlThemeMode.findViewById(R.id.rb_light_mode);
                 rbLightMode.setChecked(true);
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
-                RadioButton rbNightMode = dialog.findViewById(R.id.rb_dark_mode);
+                RadioButton rbNightMode = dlThemeMode.findViewById(R.id.rb_dark_mode);
                 rbNightMode.setChecked(true);
                 break;
             case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
-                RadioButton rbAutoMode = dialog.findViewById(R.id.rb_auto_mode);
+                RadioButton rbAutoMode = dlThemeMode.findViewById(R.id.rb_auto_mode);
                 rbAutoMode.setChecked(true);
                 break;
             default:
@@ -347,5 +354,15 @@ public class MainFragment extends Fragment {
         View headerView = ngvDrawer.getHeaderView(0);
         TextView tvSecondNav = headerView.findViewById(R.id.tv_second_nav);
         tvSecondNav.setText(R.string.nav_header_text);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.btn_maybe_later) {
+            dlRateUs.dismiss();
+        }else if (v.getId() == R.id.btn_rate_now){
+            Toast.makeText(requireActivity(), getResources().getText(R.string.thankForYourRate), Toast.LENGTH_SHORT).show();
+            dlRateUs.dismiss();
+        }
     }
 }

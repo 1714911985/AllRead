@@ -18,7 +18,7 @@ import com.example.allreader.R;
 /**
  * Author: Eccentric
  * Created on 2024/6/6 14:09.
- * Description: 监测截屏
+ * Description: 截屏监听器
  */
 public class ScreenshotObserver extends ContentObserver {
 
@@ -41,8 +41,8 @@ public class ScreenshotObserver extends ContentObserver {
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         // 创建通知
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "channel_id")
-                .setContentTitle("截屏通知")
-                .setContentText("您已进行截屏操作")
+                .setContentTitle(mContext.getResources().getText(R.string.screenshotNotification))//Screenshot notification
+                .setContentText(mContext.getResources().getText(R.string.screenshotNotificationText))//You have taken a screenshot
                 .setSmallIcon(R.drawable.logo_app)
                 .setAutoCancel(true);
 

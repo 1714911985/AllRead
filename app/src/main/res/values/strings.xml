@@ -31,4 +31,7 @@
     <string name="sorry_find_no_file">抱歉，没有找到结果！</string>
     <string name="file">文件</string>
     <string name="notificationText">点击返回 All Reader</string>
+    <string name="screenshotNotification">截屏通知</string>
+    <string name="screenshotNotificationText">您进行了截屏操作</string>
+    <string name="thankForYourRate">感谢您的评价！</string>
 </resources>

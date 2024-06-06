@@ -33,4 +33,7 @@
     <string name="sorry_find_no_file">Sorry, no results found!</string>
     <string name="file">file</string>
     <string name="notificationText">Tap to return to All Reader</string>
+    <string name="screenshotNotification">Screenshot Notification</string>
+    <string name="screenshotNotificationText">You have taken a screenshot</string>
+    <string name="thankForYourRate">Thanks for your review !</string>
 </resources>

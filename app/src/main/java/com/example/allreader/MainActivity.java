@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText(getResources().getText(R.string.notificationText))
                 .setAutoCancel(false)  // 设置点击后不自动取消
                 .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .build();// 设置为持续通知，点击通知不会消失
+                .setOngoing(true)// 设置为持续通知，点击通知不会消失
+                .build();
 
         // 发送通知
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -85,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
     private void createScreenshotNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "channel_id";
-            String channelName = "截屏通知";
-            String channelDescription = "通知用户截屏操作";
+            String channelName = "截屏通知";//Screenshot notification
+
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
-            channel.setDescription(channelDescription);
+
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
