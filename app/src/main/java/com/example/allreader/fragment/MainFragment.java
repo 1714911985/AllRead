@@ -8,10 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.GridView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -27,6 +30,7 @@ import com.example.allreader.utils.entity.GridItem;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.tencent.mmkv.MMKV;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +44,8 @@ public class MainFragment extends Fragment {
     private ViewPager2 vp2Collect;
     private NavigationView ngvDrawer;
     private NavController navController;
+    private Dialog dlThemeMode;
+    private MMKV mmkv;
 
 
     @Override
@@ -53,6 +59,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initFragment();
         bindOpenButtonToToolBar();//绑定Toolbar的按钮
         setGridView();//设置gridview
         setViewPager2();//设置viewpager2
@@ -60,6 +67,25 @@ public class MainFragment extends Fragment {
         setDrawerLayoutButton();//设置侧边栏的点击事件
         setToolBarButton();//设置toolbar两个按钮的点击事件
 
+
+    }
+
+    private void initFragment() {
+        //设置主题模式
+        int mode = mmkv.decodeInt("mode",AppCompatDelegate.MODE_NIGHT_NO);
+        switch (mode) {
+            case AppCompatDelegate.MODE_NIGHT_NO:
+                setLightMode();
+                break;
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                setNightMode();
+                break;
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+                setAutoMode();
+                break;
+            default:
+                break;
+        }
     }
 
 
@@ -74,6 +100,25 @@ public class MainFragment extends Fragment {
         ngvDrawer = view.findViewById(R.id.ngv_drawer);
 
         navController = Navigation.findNavController(view);
+        MMKV.initialize(requireActivity());
+        mmkv = MMKV.defaultMMKV();
+    }
+
+    private void listenThemeModeChanged() {
+        RadioGroup rgThemeMode = dlThemeMode.findViewById(R.id.rg_theme_mode);
+        rgThemeMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.rb_auto_mode) {//自动模式
+                    setAutoMode();
+                } else if (checkedId == R.id.rb_light_mode) {//日间模式
+                    setLightMode();
+                } else if (checkedId == R.id.rb_dark_mode) {//夜间模式
+                    setNightMode();
+                }
+                dlThemeMode.dismiss();
+            }
+        });
     }
 
     private void setToolBarButton() {
@@ -137,6 +182,8 @@ public class MainFragment extends Fragment {
         dialog.show();
 
         dlyMain.close();
+
+
     }
 
     private void setAndShowChangeThemeModeDialog() {
@@ -150,6 +197,29 @@ public class MainFragment extends Fragment {
         dialog.show();
 
         dlyMain.close();
+        dlThemeMode = dialog;
+
+        //设置默认选中的模式
+        int mode = mmkv.decodeInt("mode",AppCompatDelegate.MODE_NIGHT_NO);
+        switch (mode) {
+            case AppCompatDelegate.MODE_NIGHT_NO:
+                RadioButton rbLightMode = dialog.findViewById(R.id.rb_light_mode);
+                rbLightMode.setChecked(true);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                RadioButton rbNightMode = dialog.findViewById(R.id.rb_dark_mode);
+                rbNightMode.setChecked(true);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+                RadioButton rbAutoMode = dialog.findViewById(R.id.rb_auto_mode);
+                rbAutoMode.setChecked(true);
+                break;
+            default:
+                break;
+        }
+
+        listenThemeModeChanged();
+
     }
 
     private void setViewPager2() {
@@ -200,5 +270,27 @@ public class MainFragment extends Fragment {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(requireActivity(), dlyMain, tbMain, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         dlyMain.addDrawerListener(toggle);
         toggle.syncState();
+    }
+
+    // 日间模式
+    private void setLightMode() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        saveThemeMode(AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
+    // 夜间模式
+    private void setNightMode() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        saveThemeMode(AppCompatDelegate.MODE_NIGHT_YES);
+    }
+
+    // 自动模式
+    private void setAutoMode() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        saveThemeMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+    }
+
+    private void saveThemeMode(int mode) {
+        mmkv.encode("mode", mode);
     }
 }

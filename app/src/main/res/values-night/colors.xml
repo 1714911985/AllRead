@@ -10,8 +10,9 @@
     <color name="blue_900">#0d47a1</color>
     <color name="star_yellow">#FFD700</color>
     <color name="verylightblue">#44CCE6FF</color>
-    <color name="tabLayoutColor">#000000</color>
-    <color name="selectedTabLayoutColor">#000000</color>
+    <color name="tabLayoutColor">#999999</color>
+    <color name="selectedTabLayoutColor">#ffffff</color>
+
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>

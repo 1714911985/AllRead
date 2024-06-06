@@ -2,6 +2,7 @@ package com.example.allreader.fragment;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -60,6 +61,7 @@ public class ChangeLanguageFragment extends Fragment {
 
     private void setCheckedCustomRadioItem() {
         String language = mmkv.decodeString("language", "zh");
+
         switch (language) {
             case "zh":
                 criChinese.setChecked(true);
@@ -80,7 +82,9 @@ public class ChangeLanguageFragment extends Fragment {
     }
 
     private void setToolbarButton() {
-        tbChangeLanguage.setNavigationIcon(R.drawable.ic_back_black);
+        Drawable icon = getResources().getDrawable(R.drawable.ic_back_black);
+        icon.setBounds(0, 0, 10, 10);
+        tbChangeLanguage.setNavigationIcon(icon);
         tbChangeLanguage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
