@@ -4,6 +4,11 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,12 +16,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.allreader.MainActivity;
 import com.example.allreader.R;
@@ -63,7 +62,7 @@ public class ChangeLanguageFragment extends Fragment {
     private void setCheckedCustomRadioItem() {
         String language = mmkv.decodeString("language", "zh");
 
-        switch (language) {
+        switch (Objects.requireNonNull(language)) {
             case "zh":
                 criChinese.setChecked(true);
                 rgvChange.check(criChinese);
@@ -75,17 +74,12 @@ public class ChangeLanguageFragment extends Fragment {
                 criEnglish.performClick();
                 break;
             default:
-                criChinese.setChecked(true);
-                rgvChange.check(criChinese);
-                criChinese.performClick();
                 break;
         }
     }
 
     private void setToolbarButton() {
-        Drawable icon = getResources().getDrawable(R.drawable.ic_back_black);
-        icon.setBounds(0, 0, 10, 10);
-        tbChangeLanguage.setNavigationIcon(icon);
+        tbChangeLanguage.setNavigationIcon(R.drawable.ic_back_black);
         tbChangeLanguage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

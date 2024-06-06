@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,6 +53,7 @@ public class MainFragment extends Fragment {
     private Dialog dlThemeMode;
     private MMKV mmkv;
     private static final String appPackageName = "com.example.allreader";
+    //分享的URL   谷歌应用商城链接+包名
     private static final String appUrl = "https://play.google.com/store/apps/details?id=" + appPackageName;
 
 
@@ -77,6 +77,22 @@ public class MainFragment extends Fragment {
         setDrawerLayoutButton();//设置侧边栏的点击事件
         setToolBarButton();//设置toolbar两个按钮的点击事件
 
+    }
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        dlyMain = view.findViewById(R.id.dly_main);
+        tbMain = view.findViewById(R.id.tb_main);
+        gvClassification = view.findViewById(R.id.gv_classification);
+        tlyCollect = view.findViewById(R.id.tly_collect);
+        vp2Collect = view.findViewById(R.id.vp2_collect);
+        ngvDrawer = view.findViewById(R.id.ngv_drawer);
+
+        navController = Navigation.findNavController(view);
+        MMKV.initialize(requireActivity());
+        mmkv = MMKV.defaultMMKV();
 
     }
 
@@ -111,21 +127,28 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private void setDrawerLayoutButton() {
+        NavOptions navOptions = getNavOptions();
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        dlyMain = view.findViewById(R.id.dly_main);
-        tbMain = view.findViewById(R.id.tb_main);
-        gvClassification = view.findViewById(R.id.gv_classification);
-        tlyCollect = view.findViewById(R.id.tly_collect);
-        vp2Collect = view.findViewById(R.id.vp2_collect);
-        ngvDrawer = view.findViewById(R.id.ngv_drawer);
-
-        navController = Navigation.findNavController(view);
-        MMKV.initialize(requireActivity());
-        mmkv = MMKV.defaultMMKV();
-
+        ngvDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.item_theme_mode) {//主题模式
+                    setAndShowChangeThemeModeDialog();
+                    return true;
+                } else if (item.getItemId() == R.id.item_language) {//语言切换
+                    navController.navigate(R.id.fg_language, null, navOptions);
+                    return true;
+                } else if (item.getItemId() == R.id.item_evaluate_us) {//评价
+                    setAndShowRateUsDialog();
+                    return true;
+                } else if (item.getItemId() == R.id.item_analytical_applications) {//分享
+                    shareApp();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void listenThemeModeChanged() {
@@ -162,29 +185,6 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private void setDrawerLayoutButton() {
-        NavOptions navOptions = getNavOptions();
-
-        ngvDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.item_theme_mode) {//主题模式
-                    setAndShowChangeThemeModeDialog();
-                    return true;
-                } else if (item.getItemId() == R.id.item_language) {//语言切换
-                    navController.navigate(R.id.fg_language, null, navOptions);
-                    return true;
-                } else if (item.getItemId() == R.id.item_evaluate_us) {//评价
-                    setAndShowRateUsDialog();
-                    return true;
-                } else if (item.getItemId() == R.id.item_analytical_applications) {//分享
-                    shareApp();
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
 
     private void shareApp() {
         Intent share = new Intent(Intent.ACTION_SEND);
@@ -214,8 +214,6 @@ public class MainFragment extends Fragment {
         dialog.show();
 
         dlyMain.close();
-
-
     }
 
     private void setAndShowChangeThemeModeDialog() {
