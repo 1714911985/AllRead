@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -103,6 +104,7 @@ public class ChangeLanguageFragment extends Fragment {
                 }
                 return false;
             }
+
         });
     }
 
@@ -121,9 +123,10 @@ public class ChangeLanguageFragment extends Fragment {
         config.setLocale(locale);
         getResources().updateConfiguration(config, getResources().getDisplayMetrics());
 
+        requireActivity().finish();
         Intent refresh = new Intent(getActivity(), MainActivity.class);
         mmkv.encode("language", language);
         startActivity(refresh);
-        requireActivity().finish();
+        Log.e("TAG", "setLanguage: " );
     }
 }

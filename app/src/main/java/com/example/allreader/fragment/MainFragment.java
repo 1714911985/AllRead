@@ -1,8 +1,12 @@
 package com.example.allreader.fragment;
 
 import android.app.Dialog;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +14,7 @@ import android.view.Window;
 import android.widget.GridView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +28,7 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.allreader.MainActivity;
 import com.example.allreader.R;
 import com.example.allreader.utils.adapter.CollectAdapter;
 import com.example.allreader.utils.adapter.GridAdapter;
@@ -34,6 +40,7 @@ import com.tencent.mmkv.MMKV;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainFragment extends Fragment {
     private DrawerLayout dlyMain;
@@ -46,6 +53,8 @@ public class MainFragment extends Fragment {
     private NavController navController;
     private Dialog dlThemeMode;
     private MMKV mmkv;
+    private static final String appPackageName = "com.example.allreader";
+    private static final String appUrl = "https://play.google.com/store/apps/details?id=" + appPackageName;
 
 
     @Override
@@ -60,6 +69,7 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initFragment();
+
         bindOpenButtonToToolBar();//绑定Toolbar的按钮
         setGridView();//设置gridview
         setViewPager2();//设置viewpager2
@@ -72,7 +82,7 @@ public class MainFragment extends Fragment {
 
     private void initFragment() {
         //设置主题模式
-        int mode = mmkv.decodeInt("mode",AppCompatDelegate.MODE_NIGHT_NO);
+        int mode = mmkv.decodeInt("mode", AppCompatDelegate.MODE_NIGHT_NO);
         switch (mode) {
             case AppCompatDelegate.MODE_NIGHT_NO:
                 setLightMode();
@@ -82,6 +92,19 @@ public class MainFragment extends Fragment {
                 break;
             case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
                 setAutoMode();
+                break;
+            default:
+                break;
+        }
+
+        //设置语言
+        String language = mmkv.decodeString("language", "zh");
+        switch (language) {
+            case "zh":
+                setLanguage("zh", "CN");
+                break;
+            case "en":
+                setLanguage("en", "GB");
                 break;
             default:
                 break;
@@ -102,6 +125,7 @@ public class MainFragment extends Fragment {
         navController = Navigation.findNavController(view);
         MMKV.initialize(requireActivity());
         mmkv = MMKV.defaultMMKV();
+
     }
 
     private void listenThemeModeChanged() {
@@ -116,7 +140,8 @@ public class MainFragment extends Fragment {
                 } else if (checkedId == R.id.rb_dark_mode) {//夜间模式
                     setNightMode();
                 }
-                dlThemeMode.dismiss();
+                requireActivity().finish();
+                startActivity(new Intent(requireActivity(), MainActivity.class));
             }
         });
     }
@@ -153,12 +178,19 @@ public class MainFragment extends Fragment {
                     setAndShowRateUsDialog();
                     return true;
                 } else if (item.getItemId() == R.id.item_analytical_applications) {//分享
-
+                    shareApp();
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    private void shareApp() {
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_TEXT, appUrl);
+        startActivity(Intent.createChooser(share, "分享应用"));
     }
 
     private NavOptions getNavOptions() {
@@ -200,7 +232,7 @@ public class MainFragment extends Fragment {
         dlThemeMode = dialog;
 
         //设置默认选中的模式
-        int mode = mmkv.decodeInt("mode",AppCompatDelegate.MODE_NIGHT_NO);
+        int mode = mmkv.decodeInt("mode", AppCompatDelegate.MODE_NIGHT_NO);
         switch (mode) {
             case AppCompatDelegate.MODE_NIGHT_NO:
                 RadioButton rbLightMode = dialog.findViewById(R.id.rb_light_mode);
@@ -256,13 +288,13 @@ public class MainFragment extends Fragment {
 
     private List<GridItem> generateItems() {
         List<GridItem> gridItemList = new ArrayList<>();
-        gridItemList.add(new GridItem(R.drawable.ic_home_all, getResources().getText(R.string.all).toString(), "0 文件"));
-        gridItemList.add(new GridItem(R.drawable.ic_home_pdf, getResources().getText(R.string.pdf).toString(), "0 文件"));
-        gridItemList.add(new GridItem(R.drawable.ic_home_doc, getResources().getText(R.string.document).toString(), "0 文件"));
-        gridItemList.add(new GridItem(R.drawable.ic_home_xls, getResources().getText(R.string.xls).toString(), "0 文件"));
-        gridItemList.add(new GridItem(R.drawable.ic_home_ppt, getResources().getText(R.string.ppt).toString(), "0 文件"));
-        gridItemList.add(new GridItem(R.drawable.ic_home_txt, getResources().getText(R.string.txt).toString(), "0 文件"));
-        gridItemList.add(new GridItem(R.drawable.ic_home_other, getResources().getText(R.string.other).toString(), "0 文件"));
+        gridItemList.add(new GridItem(R.drawable.ic_home_all, getResources().getText(R.string.all).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_pdf, getResources().getText(R.string.pdf).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_doc, getResources().getText(R.string.document).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_xls, getResources().getText(R.string.xls).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_ppt, getResources().getText(R.string.ppt).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_txt, getResources().getText(R.string.txt).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_other, getResources().getText(R.string.other).toString(), "0 " + getResources().getText(R.string.file)));
         return gridItemList;
     }
 
@@ -292,5 +324,30 @@ public class MainFragment extends Fragment {
 
     private void saveThemeMode(int mode) {
         mmkv.encode("mode", mode);
+    }
+
+    private void setLanguage(String language, String country) {
+        Locale locale = new Locale(language, country);
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        updateSidebarText();
+    }
+
+    private void updateSidebarText() {
+        // 找到侧边栏中的菜单项标题，并更新文本内容
+        Menu menu = ngvDrawer.getMenu();
+        MenuItem itemLanguage = menu.findItem(R.id.item_language);
+        MenuItem itemThemeMode = menu.findItem(R.id.item_theme_mode);
+        MenuItem itemRateUs = menu.findItem(R.id.item_evaluate_us);
+        MenuItem itemShare = menu.findItem(R.id.item_analytical_applications);
+        itemLanguage.setTitle(R.string.language);
+        itemThemeMode.setTitle(R.string.theme_mode);
+        itemRateUs.setTitle(R.string.evaluate_us);
+        itemShare.setTitle(R.string.analytical_applications);
+
+        View headerView = ngvDrawer.getHeaderView(0);
+        TextView tvSecondNav = headerView.findViewById(R.id.tv_second_nav);
+        tvSecondNav.setText(R.string.nav_header_text);
     }
 }
