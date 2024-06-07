@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.allreader.MainActivity;
 import com.example.allreader.R;
 import com.example.allreader.utils.custom_view.CustomRadioItem;
@@ -27,11 +28,12 @@ import java.util.Locale;
 import java.util.Objects;
 
 
-public class ChangeLanguageFragment extends Fragment {
+public class ChangeLanguageFragment extends Fragment implements View.OnClickListener{
     private Toolbar tbChangeLanguage;
     private CustomRadioItem criChinese, criEnglish;
     private RadioGroupView rgvChange;
     private MMKV mmkv;
+    private LottieAnimationView lavConfirm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,6 +49,10 @@ public class ChangeLanguageFragment extends Fragment {
         criChinese = view.findViewById(R.id.cri_chinese);
         criEnglish = view.findViewById(R.id.cri_english);
         rgvChange = view.findViewById(R.id.rgv_change);
+        lavConfirm = view.findViewById(R.id.lav_confirm);
+        lavConfirm.setAnimation(R.raw.checked);
+        lavConfirm.playAnimation();
+        lavConfirm.setOnClickListener(this);
         MMKV.initialize(requireActivity());
         mmkv = MMKV.defaultMMKV();
     }
@@ -87,19 +93,6 @@ public class ChangeLanguageFragment extends Fragment {
                 navController.popBackStack();
             }
         });
-
-        tbChangeLanguage.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.item_confirm) {
-                    //切换语言的逻辑
-                    changeLanguage();
-                    return true;
-                }
-                return false;
-            }
-
-        });
     }
 
     private void changeLanguage() {
@@ -122,5 +115,12 @@ public class ChangeLanguageFragment extends Fragment {
         mmkv.encode("language", language);
         startActivity(refresh);
         Log.e("TAG", "setLanguage: " );
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.lav_confirm){
+            changeLanguage();
+        }
     }
 }

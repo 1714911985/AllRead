@@ -47,4 +47,6 @@ dependencies {
     implementation "androidx.room:room-runtime:2.6.1" // Room运行时库
     annotationProcessor "androidx.room:room-compiler:2.6.1" // Room编译器
 
+    implementation 'com.airbnb.android:lottie:6.4.0'
+
 }

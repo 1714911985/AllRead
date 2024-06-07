@@ -11,9 +11,19 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/confirm_menu"
         app:title="@string/change_language" />
 
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lav_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/tb_change_language"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tb_change_language"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
