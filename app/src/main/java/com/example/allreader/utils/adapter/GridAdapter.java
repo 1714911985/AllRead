@@ -60,6 +60,7 @@ public class GridAdapter extends BaseAdapter {
             holder.ivFile = convertView.findViewById(R.id.iv_file);
             holder.tvFileName = convertView.findViewById(R.id.tv_file_name);
             holder.tvFileNumber = convertView.findViewById(R.id.tv_file_number);
+            holder.tvFileText = convertView.findViewById(R.id.tv_file_text);
 
             convertView.setTag(holder);
         } else {
@@ -70,6 +71,7 @@ public class GridAdapter extends BaseAdapter {
         holder.ivFile.setImageResource(item.getImageResource());
         holder.tvFileName.setText(item.getText1());
         holder.tvFileNumber.setText(item.getText2());
+        holder.tvFileText.setText(item.getText3());
 
         return convertView;
     }
@@ -78,5 +80,6 @@ public class GridAdapter extends BaseAdapter {
         ImageView ivFile;
         TextView tvFileName;
         TextView tvFileNumber;
+        TextView tvFileText;
     }
 }

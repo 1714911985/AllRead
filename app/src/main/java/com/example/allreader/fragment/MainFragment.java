@@ -1,9 +1,18 @@
 package com.example.allreader.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +41,11 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.allreader.MainActivity;
 import com.example.allreader.R;
+import com.example.allreader.room.dao.FilesDao;
+import com.example.allreader.room.dao.FilesDao_Impl;
+import com.example.allreader.room.database.AppDatabase;
+import com.example.allreader.room.database.AppDatabase_Impl;
+import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.CollectAdapter;
 import com.example.allreader.utils.adapter.GridAdapter;
 import com.example.allreader.utils.entity.GridItem;
@@ -56,10 +70,56 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private Dialog dlThemeMode, dlRateUs;
     private Button btnMaybeLater, btnRateNow;
     private MMKV mmkv;
+    private FilesDao filesDao;
+    private AppDatabase appDatabase;
     private static final String appPackageName = "com.example.allreader";
     //分享的URL   谷歌应用商城链接+包名
     private static final String appUrl = "https://play.google.com/store/apps/details?id=" + appPackageName;
+    private int allFileCount, allPDFCount, allPPTCount, allTXTCount, allDOCCount, allXLSCount, allOTHERCount;
+    private BroadcastReceiver scanFinishedBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    allFileCount = filesDao.getAllFileCount();
+                    allPDFCount = filesDao.getAllPDFCount();
+                    allPPTCount = filesDao.getAllPPTCount();
+                    allDOCCount = filesDao.getAllDOCCount();
+                    allTXTCount = filesDao.getAllTXTCount();
+                    allXLSCount = filesDao.getAllXLSCount();
+                    allOTHERCount = filesDao.getAllOTHERCount();
+                    Log.e("MainFragment", "allFileCount: " + allFileCount);
+                    Log.e("MainFragment", "allPDFCount: " + allPDFCount);
+                    Log.e("MainFragment", "allPPTCount: " + allPPTCount);
+                    Log.e("MainFragment", "allDOCCount: " + allDOCCount);
+                    Log.e("MainFragment", "allTXTCount: " + allTXTCount);
+                    Log.e("MainFragment", "allXLSCount: " + allXLSCount);
+                    Log.e("MainFragment", "allOTHERCount: " + allOTHERCount);
 
+                    Message message = Message.obtain();
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
+            });
+
+
+        }
+    };
+
+    private Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    setGridView();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,16 +133,28 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initFragment();
-
+        initData();
         bindOpenButtonToToolBar();//绑定Toolbar的按钮
-        setGridView();//设置gridview
         setViewPager2();//设置viewpager2
+//        setGridView();
         setTabLayout();//配置tablayout
         setDrawerLayoutButton();//设置侧边栏的点击事件
         setToolBarButton();//设置toolbar两个按钮的点击事件
 
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private void initData() {
+        IntentFilter filter = new IntentFilter("com.example.allreader.ACTION_SCAN_FINISHED");
+        requireActivity().registerReceiver(scanFinishedBroadcast, filter);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setGridView();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -97,6 +169,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         navController = Navigation.findNavController(view);
         MMKV.initialize(requireActivity());
         mmkv = MMKV.defaultMMKV();
+        appDatabase = AppDatabase.getInstance(getContext());
+        filesDao = new FilesDao_Impl(appDatabase);
 
     }
 
@@ -293,13 +367,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     private List<GridItem> generateItems() {
         List<GridItem> gridItemList = new ArrayList<>();
-        gridItemList.add(new GridItem(R.drawable.ic_home_all, getResources().getText(R.string.all).toString(), "0 " + getResources().getText(R.string.file)));
-        gridItemList.add(new GridItem(R.drawable.ic_home_pdf, getResources().getText(R.string.pdf).toString(), "0 " + getResources().getText(R.string.file)));
-        gridItemList.add(new GridItem(R.drawable.ic_home_doc, getResources().getText(R.string.document).toString(), "0 " + getResources().getText(R.string.file)));
-        gridItemList.add(new GridItem(R.drawable.ic_home_xls, getResources().getText(R.string.xls).toString(), "0 " + getResources().getText(R.string.file)));
-        gridItemList.add(new GridItem(R.drawable.ic_home_ppt, getResources().getText(R.string.ppt).toString(), "0 " + getResources().getText(R.string.file)));
-        gridItemList.add(new GridItem(R.drawable.ic_home_txt, getResources().getText(R.string.txt).toString(), "0 " + getResources().getText(R.string.file)));
-        gridItemList.add(new GridItem(R.drawable.ic_home_other, getResources().getText(R.string.other).toString(), "0 " + getResources().getText(R.string.file)));
+        gridItemList.add(new GridItem(R.drawable.ic_home_all, getResources().getText(R.string.all).toString(), String.valueOf(allFileCount), allFileCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
+        gridItemList.add(new GridItem(R.drawable.ic_home_pdf, getResources().getText(R.string.pdf).toString(), String.valueOf(allPDFCount), allPDFCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
+        gridItemList.add(new GridItem(R.drawable.ic_home_doc, getResources().getText(R.string.document).toString(), String.valueOf(allDOCCount), allDOCCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
+        gridItemList.add(new GridItem(R.drawable.ic_home_xls, getResources().getText(R.string.xls).toString(), String.valueOf(allXLSCount), allXLSCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
+        gridItemList.add(new GridItem(R.drawable.ic_home_ppt, getResources().getText(R.string.ppt).toString(), String.valueOf(allPPTCount), allPPTCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
+        gridItemList.add(new GridItem(R.drawable.ic_home_txt, getResources().getText(R.string.txt).toString(), String.valueOf(allTXTCount), allTXTCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
+        gridItemList.add(new GridItem(R.drawable.ic_home_other, getResources().getText(R.string.other).toString(), String.valueOf(allOTHERCount), allOTHERCount == 1 ? getResources().getText(R.string.file).toString() : getResources().getText(R.string.files).toString()));
         return gridItemList;
     }
 
@@ -360,9 +434,15 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.btn_maybe_later) {
             dlRateUs.dismiss();
-        }else if (v.getId() == R.id.btn_rate_now){
+        } else if (v.getId() == R.id.btn_rate_now) {
             Toast.makeText(requireActivity(), getResources().getText(R.string.thankForYourRate), Toast.LENGTH_SHORT).show();
             dlRateUs.dismiss();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        requireActivity().unregisterReceiver(scanFinishedBroadcast);
     }
 }

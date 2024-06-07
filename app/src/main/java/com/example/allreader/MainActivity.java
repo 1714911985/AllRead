@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -34,8 +35,18 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.allreader.room.dao.FilesDao;
+import com.example.allreader.room.dao.FilesDao_Impl;
+import com.example.allreader.room.database.AppDatabase;
+import com.example.allreader.room.database.AppDatabase_Impl;
+import com.example.allreader.room.entity.Files;
+import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.observer.ScreenshotObserver;
+import com.example.allreader.utils.util.FileUtils;
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.File;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,12 +56,15 @@ public class MainActivity extends AppCompatActivity {
     private ScreenshotObserver screenshotObserver;
     private AlertDialog goSettingDialog;
     public static final int REQUEST_WRITE_EXTERNAL_STORAGE = 12;
+    private FilesDao filesDao;
+    private AppDatabase appDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        initData();
 
         createNotificationChannel();//创建通知渠道
         sendNotification();// 发送通知
@@ -64,6 +78,11 @@ public class MainActivity extends AppCompatActivity {
         createScreenshotNotificationChannel();
 
         checkAndRequestPermissionThenScan();
+    }
+
+    private void initData() {
+        appDatabase = AppDatabase.getInstance(this);
+        filesDao = new FilesDao_Impl(appDatabase);
     }
 
 
@@ -200,9 +219,57 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //文件扫描
     private void startScan() {
+        ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                filesDao.deleteAll();
+                File externalFilesDirs = Environment.getExternalStorageDirectory();
+                Log.e("Test_tag", "run: " + externalFilesDirs.getAbsolutePath() );
+                ConcurrentLinkedQueue<File> fileQueue = new ConcurrentLinkedQueue<>();
+                fileQueue.offer(externalFilesDirs);
+                while (!fileQueue.isEmpty()) {
+                    File file = fileQueue.poll();
+                    if (file == null || !file.exists()) {
+                        continue;
+                    }
+                    File[] files = file.listFiles();
+                    if (files == null) {
+                        Log.e("TAG", "getExternalStoragePublicDirectory 没子目录 " );
+                        continue;
+                    }
+                    Log.e("TAG", "getExternalStoragePublicDirectory 有子目录 " );
+
+                    for (File childFile : files) {
+                        if (childFile == null) {
+                            continue;
+                        }
+
+                        if (childFile.isDirectory()) {
+                            //文件夹  加到队列里
+                            fileQueue.offer(childFile);
+                            Log.e("文件夹", childFile.getAbsolutePath() );
+                        } else {
+                            if (FileUtils.isDocument(childFile)) {
+                                Log.e("文件", childFile.getAbsolutePath() );
+                                //文档类型文件  直接加到数据库里面
+                                filesDao.insert(FileUtils.fileToFileEntity(childFile));
+                            }
+                        }
+                    }
+                }
+                sendBroadcast();
+            }
+        });
+
+
 
     }
 
+    private void sendBroadcast() {
+        Intent intent = new Intent("com.example.allreader.ACTION_SCAN_FINISHED");
+        sendBroadcast(intent);
+    }
 
 }

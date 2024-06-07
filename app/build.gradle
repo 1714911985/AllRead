@@ -26,6 +26,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 dependencies {
@@ -42,5 +43,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.7.7"
     implementation "androidx.navigation:navigation-ui-ktx:2.7.7"
     implementation 'com.tencent:mmkv:1.2.13'
+
+    implementation "androidx.room:room-runtime:2.6.1" // Room运行时库
+    annotationProcessor "androidx.room:room-compiler:2.6.1" // Room编译器
 
 }

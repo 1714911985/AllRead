@@ -40,4 +40,5 @@
     <string name="toAuthorize">Authorize</string>
     <string name="needStoragePermission">Need Storage Permission</string>
     <string name="hasNoPermission">No Permission</string>
+    <string name="files">files</string>
 </resources>

@@ -38,4 +38,5 @@
     <string name="toAuthorize">授权</string>
     <string name="needStoragePermission">需要存储权限</string>
     <string name="hasNoPermission">没有权限</string>
+    <string name="files">文件</string>
 </resources>
