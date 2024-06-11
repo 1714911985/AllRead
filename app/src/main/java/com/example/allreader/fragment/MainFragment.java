@@ -3,10 +3,12 @@ package com.example.allreader.fragment;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.RadioButton;
@@ -57,6 +60,7 @@ import com.tencent.mmkv.MMKV;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainFragment extends Fragment implements View.OnClickListener {
     private DrawerLayout dlyMain;
@@ -355,7 +359,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     private void setGridView() {
         List<GridItem> gridItemList = generateItems();
-        adapter = new GridAdapter(requireActivity(), R.layout.grid_file, gridItemList);
+        adapter = new GridAdapter(requireActivity(), R.layout.grid_file, gridItemList,getView());
         gvClassification.setAdapter(adapter);
     }
 
@@ -445,4 +449,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         super.onDestroy();
         requireActivity().unregisterReceiver(scanFinishedBroadcast);
     }
+
+
 }

@@ -25,6 +25,9 @@ public interface FilesDao {
     @Query("DELETE FROM files")
     void deleteAll();
 
+    @Query("UPDATE files SET isCollected = :isCollected WHERE id = :id")
+    void updateIsFavorite(int id, int isCollected);
+
     @Query("UPDATE files SET fileName = :newFileName WHERE id = :id")
     void updateFileName(int id, String newFileName);
 
@@ -42,6 +45,9 @@ public interface FilesDao {
 
     @Query("SELECT * FROM files ORDER BY createdTime DESC")
     List<Files> getAllFilesSortedByCreatedTimeDescending();
+
+    @Query("SELECT * FROM files WHERE fileType = 'PDF' ORDER BY createdTime DESC")
+    List<Files> getPDFFilesSortedByCreatedTimeDescending();
 
     @Query("SELECT * FROM files ORDER BY fileType ASC")
     List<Files> getAllFilesSortedByFileTypeAscending();

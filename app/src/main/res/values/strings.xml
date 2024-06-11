@@ -39,4 +39,18 @@
     <string name="needStoragePermission">需要存储权限</string>
     <string name="hasNoPermission">没有权限</string>
     <string name="files">文件</string>
+    <string name="ALL">ALL</string>
+    <string name="PDF">PDF</string>
+    <string name="WORD">WORD</string>
+    <string name="EXCEL">EXCEL</string>
+    <string name="SLIDE">SLIDE</string>
+    <string name="TXT">TXT</string>
+    <string name="OTHER">OTHER</string>
+    <string name="title_all">全部文件</string>
+    <string name="title_pdf">PDF文件</string>
+    <string name="title_document">WORD文件</string>
+    <string name="title_xls">EXCEL文件</string>
+    <string name="title_ppt">幻灯片文件</string>
+    <string name="title_txt">TXT文件</string>
+    <string name="title_other">其他文件</string>
 </resources>

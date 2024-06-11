@@ -18,6 +18,9 @@
         <action
             android:id="@+id/action_fg_main_to_searchFragment"
             app:destination="@id/fg_search" />
+        <action
+            android:id="@+id/action_fg_main_to_classificationDisplayFragment"
+            app:destination="@id/fg_classification_display" />
     </fragment>
     <fragment
         android:id="@+id/fg_language"
@@ -29,6 +32,11 @@
         android:name="com.example.allreader.fragment.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/fg_classification_display"
+        android:name="com.example.allreader.fragment.ClassificationDisplayFragment"
+        android:label="fragment_classification_display"
+        tools:layout="@layout/fragment_classification_display" />
 
 
 </navigation>

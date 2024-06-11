@@ -14,7 +14,7 @@
         app:menu="@menu/classification_display_toolbar_menu"
         tools:title="全部" />
 
-    <TableLayout
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/tly_classification_display"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

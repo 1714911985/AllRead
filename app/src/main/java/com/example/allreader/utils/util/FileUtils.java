@@ -22,23 +22,23 @@ import java.util.Locale;
 public class FileUtils {
 
     // 将File对象转换为File实体类
-    public static Files fileToFileEntity(File file) {
-        Files fileEntity = new Files();
-        fileEntity.setFileName(file.getName());
-        fileEntity.setFileUri(file.getAbsolutePath());
-        fileEntity.setFileSize((int) file.length());
-        fileEntity.setFileType(getFileType(file.getName()));
-        // 设置创建时间、最后修改时间等信息
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        fileEntity.setCreatedTime(getFileCreationTime(file));
-        fileEntity.setChangedTime(sdf.format(new Date(file.lastModified())));
-        fileEntity.setLatestTime(null);
-        fileEntity.setIsCollected(0); // 默认为未收藏
-        return fileEntity;
-    }
+//    public static Files fileToFileEntity(File file) {
+//        Files fileEntity = new Files();
+//        fileEntity.setFileName(file.getName());
+//        fileEntity.setFileUri(file.getAbsolutePath());
+//        fileEntity.setFileSize((int) file.length());
+//        fileEntity.setFileType(getFileType(file.getName()));
+//        // 设置创建时间、最后修改时间等信息
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+//        fileEntity.setCreatedTime(getFileCreationTime(file));
+//        fileEntity.setChangedTime(sdf.format(new Date(file.lastModified())));
+//        fileEntity.setLatestTime(null);
+//        fileEntity.setIsCollected(0); // 默认为未收藏
+//        return fileEntity;
+//    }
 
     // 根据文件名获取文件类型
-    private static String getFileType(String fileName) {
+    public static String getFileType(String fileName) {
         int index = fileName.lastIndexOf('.');
         if (index > 0) {
             String end = fileName.substring(index + 1).toLowerCase();
@@ -72,7 +72,6 @@ public class FileUtils {
                 fileName.endsWith(".xls") || fileName.endsWith(".xlsx") ||
                 fileName.endsWith(".pdf") ||
                 fileName.endsWith(".txt") ||
-                fileName.endsWith(".log") ||
                 fileName.endsWith(".xml") ||
                 fileName.endsWith(".json");
     }
@@ -95,5 +94,15 @@ public class FileUtils {
             }
         }
         return sdf.format(new Date(file.lastModified()));
+    }
+
+    public static String getNameWithPath(String pathStr) {
+        if (pathStr == null || pathStr.isEmpty()) {
+            return "";
+        }
+
+        // 使用 File 类解析路径
+        File file = new File(pathStr);
+        return file.getName();
     }
 }

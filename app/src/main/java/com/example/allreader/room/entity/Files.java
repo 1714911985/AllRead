@@ -15,12 +15,27 @@ public class Files {
     private int id;//id
     private String fileName;//文件名
     private String fileUri;//文件uri
-    private int fileSize;//文件大小
+    private long fileSize;//文件大小
     private String fileType;//文件类型
-    private String createdTime;//创建时间
-    private String changedTime;//最后修改事件
-    private String latestTime;//最近点击时间
+    private long createdTime;//创建时间
+    private long changedTime;//最后修改事件
+    private long latestTime;//最近点击时间
     private int isCollected;//是否收藏  0没有   1收藏
+
+    public Files() {
+    }
+
+    @Ignore
+    public Files(String fileName, String fileUri, long fileSize, String fileType, long createdTime, long changedTime, long latestTime, int isCollected) {
+        this.fileName = fileName;
+        this.fileUri = fileUri;
+        this.fileSize = fileSize;
+        this.fileType = fileType;
+        this.createdTime = createdTime;
+        this.changedTime = changedTime;
+        this.latestTime = latestTime;
+        this.isCollected = isCollected;
+    }
 
     public int getId() {
         return id;
@@ -46,11 +61,11 @@ public class Files {
         this.fileUri = fileUri;
     }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 
@@ -62,27 +77,27 @@ public class Files {
         this.fileType = fileType;
     }
 
-    public String getCreatedTime() {
+    public long getCreatedTime() {
         return createdTime;
     }
 
-    public void setCreatedTime(String createdTime) {
+    public void setCreatedTime(long createdTime) {
         this.createdTime = createdTime;
     }
 
-    public String getChangedTime() {
+    public long getChangedTime() {
         return changedTime;
     }
 
-    public void setChangedTime(String changedTime) {
+    public void setChangedTime(long changedTime) {
         this.changedTime = changedTime;
     }
 
-    public String getLatestTime() {
+    public long getLatestTime() {
         return latestTime;
     }
 
-    public void setLatestTime(String latestTime) {
+    public void setLatestTime(long latestTime) {
         this.latestTime = latestTime;
     }
 
@@ -94,7 +109,19 @@ public class Files {
         this.isCollected = isCollected;
     }
 
-
-    public Files() {
+    @Override
+    @Ignore
+    public String toString() {
+        return "Files{" +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
+                ", fileUri='" + fileUri + '\'' +
+                ", fileSize=" + fileSize +
+                ", fileType='" + fileType + '\'' +
+                ", createdTime=" + createdTime +
+                ", changedTime=" + changedTime +
+                ", latestTime=" + latestTime +
+                ", isCollected=" + isCollected +
+                '}';
     }
 }

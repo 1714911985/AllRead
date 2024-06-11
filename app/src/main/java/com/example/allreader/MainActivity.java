@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -46,10 +48,12 @@ import com.example.allreader.utils.util.FileUtils;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final static String TAG = "MainActivity";
+    private Context context;
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "PermanentChannel";
     private static final String Notification_Title = "All Reader";
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private void initData() {
         appDatabase = AppDatabase.getInstance(this);
         filesDao = new FilesDao_Impl(appDatabase);
+        context = this;
     }
 
 
@@ -219,57 +224,79 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void sendBroadcast() {
+        Intent intent = new Intent("com.example.allreader.ACTION_SCAN_FINISHED");
+        sendBroadcast(intent);
+    }
+
     //文件扫描
     private void startScan() {
         ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                filesDao.deleteAll();
-                File externalFilesDirs = Environment.getExternalStorageDirectory();
-                Log.e("Test_tag", "run: " + externalFilesDirs.getAbsolutePath() );
-                ConcurrentLinkedQueue<File> fileQueue = new ConcurrentLinkedQueue<>();
-                fileQueue.offer(externalFilesDirs);
-                while (!fileQueue.isEmpty()) {
-                    File file = fileQueue.poll();
-                    if (file == null || !file.exists()) {
-                        continue;
-                    }
-                    File[] files = file.listFiles();
-                    if (files == null) {
-                        Log.e("TAG", "getExternalStoragePublicDirectory 没子目录 " );
-                        continue;
-                    }
-                    Log.e("TAG", "getExternalStoragePublicDirectory 有子目录 " );
+                ContentResolver resolver = context.getContentResolver();
+                String doc = MimeTypeMap.getSingleton().getMimeTypeFromExtension("doc");
+                String docx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("docx");
+                String ppt = MimeTypeMap.getSingleton().getMimeTypeFromExtension("ppt");
+                String pptx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pptx");
+                String xls = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xls");
+                String xlsx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xlsx");
+                String pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
+                String txt = MimeTypeMap.getSingleton().getMimeTypeFromExtension("txt");
+                String xml = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xml");
+                String json = MimeTypeMap.getSingleton().getMimeTypeFromExtension("json");
+                //Table
+                Uri table = MediaStore.Files.getContentUri("external");
+                //Column
+                String[] column = {MediaStore.Files.FileColumns.DATA,
+                        MediaStore.Files.FileColumns.DATE_MODIFIED,
+                        MediaStore.Files.FileColumns.DATE_ADDED,
+                        MediaStore.Files.FileColumns.SIZE};
+                //Where
+                String where = "(" + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?"
+                        + " OR " + MediaStore.Files.FileColumns.MIME_TYPE + "=?)"
+                        + " AND " + MediaStore.Files.FileColumns.SIZE + " > 0";
+                //args
+                String[] args = new String[]{doc, docx, pptx, ppt, xls, xlsx, pdf, txt, xml, json};
+                long time = System.currentTimeMillis();
+                Cursor cursor = resolver.query(table, column, where, args, MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC");
+                Log.e(TAG, "RouteHelper >>>>>>>> MediaStore query time = " + (System.currentTimeMillis() - time));
+                if (cursor != null) {
+                    int count = cursor.getCount();
+                    if (count > 0) {
+                        filesDao.deleteAll();
+                        //扫描有结果
+                        int columnIndexOfData = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA);
+                        int columnIndexOfDateModified = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED);
+                        int columnIndexOfDateAdded = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED);
+                        int columnIndexOfSize = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE);
 
-                    for (File childFile : files) {
-                        if (childFile == null) {
-                            continue;
-                        }
+                        while (cursor.moveToNext()) {
+                            String pathStr = cursor.getString(columnIndexOfData);
+                            long dateModifiedLong = cursor.getLong(columnIndexOfDateModified);
+                            long dateAddedLong = cursor.getLong(columnIndexOfDateAdded);
+                            long sizeLong = cursor.getLong(columnIndexOfSize);
 
-                        if (childFile.isDirectory()) {
-                            //文件夹  加到队列里
-                            fileQueue.offer(childFile);
-                            Log.e("文件夹", childFile.getAbsolutePath() );
-                        } else {
-                            if (FileUtils.isDocument(childFile)) {
-                                Log.e("文件", childFile.getAbsolutePath() );
-                                //文档类型文件  直接加到数据库里面
-                                filesDao.insert(FileUtils.fileToFileEntity(childFile));
-                            }
+                            int index = pathStr.lastIndexOf('/');
+                            String fileName = pathStr.substring(index + 1).toLowerCase();
+                            String fileType = FileUtils.getFileType(fileName);
+                            Files files = new Files(fileName, pathStr, sizeLong, fileType, dateAddedLong, dateModifiedLong, 0, 0);
+                            filesDao.insert(files);
                         }
                     }
                 }
-                sendBroadcast();
+                sendBroadcast(new Intent("com.example.allreader.ACTION_SCAN_FINISHED"));
             }
         });
 
-
-
-    }
-
-    private void sendBroadcast() {
-        Intent intent = new Intent("com.example.allreader.ACTION_SCAN_FINISHED");
-        sendBroadcast(intent);
     }
 
 }

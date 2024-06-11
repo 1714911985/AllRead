@@ -15,7 +15,7 @@ import com.example.allreader.room.entity.Files;
  * Created on 2024/6/7 11:04.
  * Description: com.example.allreader.room.database.AppDatabase
  */
-@Database(entities = {Files.class}, version = 1)
+@Database(entities = {Files.class}, version = 1,exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract FilesDao fileDao();
 
