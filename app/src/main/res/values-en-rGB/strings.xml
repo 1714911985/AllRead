@@ -55,4 +55,17 @@
     <string name="title_ppt">SLIDE FILES</string>
     <string name="title_txt">TXT FILES</string>
     <string name="title_other">OTHER FILES</string>
+    <string name="filter">Filter</string>
+    <string name="viewAs">View As</string>
+    <string name="List">List</string>
+    <string name="Grid">Grid</string>
+    <string name="sortBy">Sort By</string>
+    <string name="Name">Name</string>
+    <string name="Date">Date</string>
+    <string name="Type">Type</string>
+    <string name="Size">Size</string>
+    <string name="orderBy">Order By</string>
+    <string name="Asc">Ascending</string>
+    <string name="Desc">Descending</string>
+    <string name="apply">APPLY</string>
 </resources>

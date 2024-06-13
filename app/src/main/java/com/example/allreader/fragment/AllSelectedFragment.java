@@ -61,8 +61,9 @@ public class AllSelectedFragment extends Fragment {
         ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
             @Override
             public void run() {
+                long currentTimeMillis = System.currentTimeMillis();
                 filesList = filesDao.getAllFilesSortedByCreatedTimeDescending();
-                Log.e(TAG, "filesList,size() : "+filesList.size() );
+                Log.e("getAllFilesSortedByCreatedTimeDescending", System.currentTimeMillis()-currentTimeMillis+"" );
                 // 在主线程更新 UI
                 rvAllSelected.post(new Runnable() {
                     @Override

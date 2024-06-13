@@ -20,4 +20,10 @@
     <color name="colorPrimaryNight">#1E88E5</color>
     <color name="colorPrimaryDarkNight">#0D47A1</color>
     <color name="colorAccentNight">#FF4081</color>
+
+    <color name="buttonSelectedColor">#2c76f3</color>
+    <color name="buttonSelectedColorPressed">#4a94ff</color>
+    <color name="bottomDialogBackgroundColor">#3fB0C4DE</color>
+    <color name="notSelectedColor">#adb7c9</color>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.example.allreader.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.view.ViewGroup;
 
 import com.example.allreader.R;
 import com.example.allreader.utils.adapter.ClassificationDisplayAdapter;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -44,14 +47,16 @@ public class ClassificationDisplayFragment extends Fragment {
         tbClassificationDisplay = view.findViewById(R.id.tb_classification_display);
         tlyClassificationDisplay = view.findViewById(R.id.tly_classification_display);
         vp2ClassificationDisplay = view.findViewById(R.id.vp2_classification_display);
+
+        setToolBarButton();
+        setViewPager2();
+        setTabLayout();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        setToolBarButton();
-        setViewPager2();
-        setTabLayout();
+
 
     }
 
@@ -77,12 +82,18 @@ public class ClassificationDisplayFragment extends Fragment {
                     navController.navigate(R.id.fg_search, null, getNavOptions());
                     return true;
                 } else if (item.getItemId() == R.id.item_show) {//展示方式按钮
-
+                    showBottomDialog(requireActivity());
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    private void showBottomDialog(Context context) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
+        bottomSheetDialog.setContentView(getLayoutInflater().inflate(R.layout.dialog_bottom_arrangement, null));
+        bottomSheetDialog.show();
     }
 
     private void setToolBarTitle(int position) {
@@ -125,7 +136,7 @@ public class ClassificationDisplayFragment extends Fragment {
     }
 
     private void setTabLayout() {
-        new TabLayoutMediator(tlyClassificationDisplay, vp2ClassificationDisplay, new TabLayoutMediator.TabConfigurationStrategy() {
+        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tlyClassificationDisplay, vp2ClassificationDisplay, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 switch (position) {
@@ -152,15 +163,12 @@ public class ClassificationDisplayFragment extends Fragment {
                         break;
                 }
             }
-        }).attach();
-        TabLayout.Tab tab = tlyClassificationDisplay.getTabAt(position);
-        if (tab != null) {
-            tab.select();
-        }
-
+        });
+        tabLayoutMediator.attach();
         tlyClassificationDisplay.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                Log.d("ldl", "tab222:" + tab.getText() + ", position:" + tab.getPosition());
                 setToolBarTitle(tab.getPosition());
             }
 
@@ -174,11 +182,20 @@ public class ClassificationDisplayFragment extends Fragment {
 
             }
         });
+        vp2ClassificationDisplay.post(new Runnable() {
+            @Override
+            public void run() {
+//                vp2ClassificationDisplay.setCurrentItem(position);
+                TabLayout.Tab tab = tlyClassificationDisplay.getTabAt(position);
+                if (tab != null) {
+                    tab.select();
+                }
+            }
+        });
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
     }
 }

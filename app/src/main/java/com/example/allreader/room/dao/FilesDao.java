@@ -82,5 +82,8 @@ public interface FilesDao {
     @Query("SELECT COUNT(*) FROM files WHERE fileType = 'OTHER'")
     int getAllOTHERCount();
 
+    @Query("SELECT * FROM files WHERE id = :id")
+    Files getFilesById(int id);
+
 
 }

@@ -1,10 +1,6 @@
 package com.example.allreader.utils.adapter;
 
 import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,8 +87,8 @@ public class RecycleListAdapter extends RecyclerView.Adapter<RecycleListAdapter.
                     @Override
                     public void run() {
                         holder.ivIsFavorite.setImageResource(1 - thisFiles.getIsCollected() == 0 ? R.drawable.ic_star : R.drawable.ic_star_on);
-
                         filesDao.updateIsFavorite(thisFiles.getId(), 1 - thisFiles.getIsCollected());
+                        thisFiles = filesDao.getFilesById(thisFiles.getId());
                     }
                 });
 

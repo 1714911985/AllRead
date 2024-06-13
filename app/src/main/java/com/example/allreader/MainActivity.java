@@ -31,25 +31,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 
 import com.example.allreader.room.dao.FilesDao;
 import com.example.allreader.room.dao.FilesDao_Impl;
 import com.example.allreader.room.database.AppDatabase;
-import com.example.allreader.room.database.AppDatabase_Impl;
 import com.example.allreader.room.entity.Files;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.observer.ScreenshotObserver;
 import com.example.allreader.utils.util.FileUtils;
-import com.google.android.material.navigation.NavigationView;
-
-import java.io.File;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -81,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         // 创建通知渠道
         createScreenshotNotificationChannel();
 
+        //检查请求权限后扫描
         checkAndRequestPermissionThenScan();
     }
 

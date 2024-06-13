@@ -93,13 +93,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     allTXTCount = filesDao.getAllTXTCount();
                     allXLSCount = filesDao.getAllXLSCount();
                     allOTHERCount = filesDao.getAllOTHERCount();
-                    Log.e("MainFragment", "allFileCount: " + allFileCount);
-                    Log.e("MainFragment", "allPDFCount: " + allPDFCount);
-                    Log.e("MainFragment", "allPPTCount: " + allPPTCount);
-                    Log.e("MainFragment", "allDOCCount: " + allDOCCount);
-                    Log.e("MainFragment", "allTXTCount: " + allTXTCount);
-                    Log.e("MainFragment", "allXLSCount: " + allXLSCount);
-                    Log.e("MainFragment", "allOTHERCount: " + allOTHERCount);
 
                     Message message = Message.obtain();
                     message.what = 1;
@@ -233,23 +226,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void listenThemeModeChanged() {
-        RadioGroup rgThemeMode = dlThemeMode.findViewById(R.id.rg_theme_mode);
-        rgThemeMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.rb_auto_mode) {//自动模式
-                    setAutoMode();
-                } else if (checkedId == R.id.rb_light_mode) {//日间模式
-                    setLightMode();
-                } else if (checkedId == R.id.rb_dark_mode) {//夜间模式
-                    setNightMode();
-                }
-                requireActivity().finish();
-                startActivity(new Intent(requireActivity(), MainActivity.class));
-            }
-        });
-    }
+
 
     private void setToolBarButton() {
         tbMain.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -335,6 +312,24 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         listenThemeModeChanged();
 
+    }
+
+    private void listenThemeModeChanged() {
+        RadioGroup rgThemeMode = dlThemeMode.findViewById(R.id.rg_theme_mode);
+        rgThemeMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.rb_auto_mode) {//自动模式
+                    setAutoMode();
+                } else if (checkedId == R.id.rb_light_mode) {//日间模式
+                    setLightMode();
+                } else if (checkedId == R.id.rb_dark_mode) {//夜间模式
+                    setNightMode();
+                }
+                requireActivity().finish();
+                startActivity(new Intent(requireActivity(), MainActivity.class));
+            }
+        });
     }
 
     private void setViewPager2() {
@@ -449,6 +444,4 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         super.onDestroy();
         requireActivity().unregisterReceiver(scanFinishedBroadcast);
     }
-
-
 }

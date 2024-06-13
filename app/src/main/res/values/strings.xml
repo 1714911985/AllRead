@@ -53,4 +53,17 @@
     <string name="title_ppt">幻灯片文件</string>
     <string name="title_txt">TXT文件</string>
     <string name="title_other">其他文件</string>
+    <string name="filter">筛选</string>
+    <string name="viewAs">查看方式</string>
+    <string name="List">列表显示</string>
+    <string name="Grid">网格视图</string>
+    <string name="sortBy">排序方式</string>
+    <string name="Name">名称</string>
+    <string name="Date">日期</string>
+    <string name="Type">类型</string>
+    <string name="Size">大小</string>
+    <string name="orderBy">升序降序</string>
+    <string name="Asc">升序</string>
+    <string name="Desc">降序</string>
+    <string name="apply">提交</string>
 </resources>

@@ -21,4 +21,5 @@
     <color name="colorPrimaryNight">#1E88E5</color>
     <color name="colorPrimaryDarkNight">#0D47A1</color>
     <color name="colorAccentNight">#FF4081</color>
+    <color name="bottomDialogBackgroundColor">#6f000000</color>
 </resources>
