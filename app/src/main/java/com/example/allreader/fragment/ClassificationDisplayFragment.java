@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import com.example.allreader.R;
 import com.example.allreader.utils.adapter.ClassificationDisplayAdapter;
 import com.example.allreader.utils.custom_view.ButtomDialogRadioGroup;
+import com.example.allreader.utils.entity.EventMessage;
+import com.example.allreader.utils.util.EventBusUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -57,6 +59,7 @@ public class ClassificationDisplayFragment extends Fragment {
         tbClassificationDisplay = view.findViewById(R.id.tb_classification_display);
         tlyClassificationDisplay = view.findViewById(R.id.tly_classification_display);
         vp2ClassificationDisplay = view.findViewById(R.id.vp2_classification_display);
+
 
         setToolBarButton();
         setViewPager2();
@@ -127,6 +130,7 @@ public class ClassificationDisplayFragment extends Fragment {
                 mmkv.encode("sortMethodId",sortMethodId);
                 mmkv.encode("orderMethodId",orderMethodId);
                 //刷新
+                EventBusUtils.post(new EventMessage(sortMethodId,orderMethodId));
                 bottomSheetDialog.dismiss();
             }
         });

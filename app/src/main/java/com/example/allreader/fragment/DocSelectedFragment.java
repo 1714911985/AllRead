@@ -22,7 +22,12 @@ import com.example.allreader.room.entity.Files;
 import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.RecycleListAdapter;
+import com.example.allreader.utils.entity.EventMessage;
+import com.example.allreader.utils.util.EventBusUtils;
 import com.example.allreader.utils.util.QueryMethodUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +38,7 @@ public class DocSelectedFragment extends Fragment {
     private FilesDao filesDao;
     private AppDatabase appDatabase;
     private List<Files> filesList;
+    private RecycleListAdapter recycleListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +62,7 @@ public class DocSelectedFragment extends Fragment {
         int orderMethodId = MMKVManager.getInt("orderMethodId", R.id.bdrb_desc);
 
         List<Files> initialFileList = new ArrayList<>();
-        RecycleListAdapter recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
+         recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
         if (viewMethodId == R.id.bdrb_list){
             rvDocSelected.setAdapter(recycleListAdapter);
         }else {
@@ -65,11 +71,17 @@ public class DocSelectedFragment extends Fragment {
 
         rvDocSelected.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        updateAdapter(sortMethodId,orderMethodId);
+    }
+
+    private void updateAdapter(int sortMethodId, int orderMethodId) {
         ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                filesList = QueryMethodUtils.chooseQueryMethod(filesDao,"DOC",sortMethodId,orderMethodId);
+                long currentTimeMillis = System.currentTimeMillis();
+                filesList = QueryMethodUtils.chooseQueryMethod(filesDao, "DOC", sortMethodId, orderMethodId);
 
+                Log.e("getAllFilesSortedByCreatedTimeDescending", System.currentTimeMillis() - currentTimeMillis + "");
                 // 在主线程更新 UI
                 rvDocSelected.post(new Runnable() {
                     @Override
@@ -84,5 +96,22 @@ public class DocSelectedFragment extends Fragment {
                 });
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void messageEventBus(EventMessage message) {
+        updateAdapter(message.getSortMethodId(), message.getOrderMethodId());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBusUtils.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBusUtils.unregister(this);
     }
 }

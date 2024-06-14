@@ -1,6 +1,8 @@
 package com.example.allreader.utils.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +29,9 @@ import java.util.Locale;
  * Description: com.example.allreader.utils.adapter.RecycleListAdapter
  */
 public class RecycleListAdapter extends RecyclerView.Adapter<RecycleListAdapter.ViewHolder> {
-    private static int isFavorite;
     private List<Files> filesList;
     private List<Files> filteredList;
     private FilesDao filesDao;
-    private Files thisFiles;
 
     public RecycleListAdapter(List<Files> filesList, FilesDao filesDao) {
         this.filesList = filesList;
@@ -55,49 +55,62 @@ public class RecycleListAdapter extends RecyclerView.Adapter<RecycleListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        thisFiles = filesList.get(position);
-        int resId = 0;
-        isFavorite = thisFiles.getIsCollected();
-        switch (thisFiles.getFileType()) {
-            case "PPT":
-                resId = R.drawable.ic_item_file_ppt;
-                break;
-            case "DOC":
-                resId = R.drawable.ic_item_file_doc;
-                break;
-            case "XLS":
-                resId = R.drawable.ic_item_file_xls;
-                break;
-            case "PDF":
-                resId = R.drawable.ic_item_file_pdf;
-                break;
-            case "TXT":
-                resId = R.drawable.ic_item_file_txt;
-                break;
-            case "OTHER":
-                resId = R.drawable.ic_item_file_other;
-                break;
-        }
+        Files currentFile = filesList.get(position); // 获取当前项的文件对象
+        Log.e("TAG", "绑定文件: " + currentFile.getFileName());
+
+        int resId = getIconResourceForFileType(currentFile.getFileType());
 
         holder.ivItemFile.setImageResource(resId);
-        holder.tvItemFileName.setText(thisFiles.getFileName());
-        holder.tvItemFileTimeAndSize.setText(getFileTimeAndSize(thisFiles.getCreatedTime() * 1000, thisFiles.getFileSize()));
-        holder.ivIsFavorite.setImageResource(isFavorite == 0 ? R.drawable.ic_star : R.drawable.ic_star_on);
+        holder.tvItemFileName.setText(currentFile.getFileName());
+        holder.tvItemFileTimeAndSize.setText(getFileTimeAndSize(currentFile.getCreatedTime() * 1000, currentFile.getFileSize()));
+        holder.ivIsFavorite.setImageResource(currentFile.getIsCollected() == 0 ? R.drawable.ic_star : R.drawable.ic_star_on);
+
         holder.ivIsFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        holder.ivIsFavorite.setImageResource(1 - thisFiles.getIsCollected() == 0 ? R.drawable.ic_star : R.drawable.ic_star_on);
-                        filesDao.updateIsFavorite(thisFiles.getId(), 1 - thisFiles.getIsCollected());
-                        thisFiles = filesDao.getFilesById(thisFiles.getId());
-                    }
-                });
-
+                toggleFavoriteStatus(currentFile, holder);
             }
         });
     }
+
+    private int getIconResourceForFileType(String fileType) {
+        switch (fileType) {
+            case "PPT":
+                return R.drawable.ic_item_file_ppt;
+            case "DOC":
+                return R.drawable.ic_item_file_doc;
+            case "XLS":
+                return R.drawable.ic_item_file_xls;
+            case "PDF":
+                return R.drawable.ic_item_file_pdf;
+            case "TXT":
+                return R.drawable.ic_item_file_txt;
+            case "OTHER":
+                return R.drawable.ic_item_file_other;
+            default:
+                return R.drawable.ic_item_file_other;
+        }
+    }
+
+    private void toggleFavoriteStatus(Files file, ViewHolder holder) {
+        ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                filesDao.updateIsFavorite(file.getId(), 1 - file.getIsCollected());
+
+                // 在主线程中更新UI
+                ((Activity) holder.itemView.getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        file.setIsCollected(1 - file.getIsCollected()); // 更新文件对象的收藏状态
+                        holder.ivIsFavorite.setImageResource(file.getIsCollected() == 0 ? R.drawable.ic_star : R.drawable.ic_star_on);
+                        Log.e("TAG", "点击后是否被收藏: " + (file.getIsCollected() == 1 ? "是" : "否"));
+                    }
+                });
+            }
+        });
+    }
+
 
     private CharSequence getFileTimeAndSize(long createdTime, long fileSize) {
         // 创建 SimpleDateFormat 对象

@@ -19,6 +19,9 @@ public interface FilesDao {
     @Insert
     void insert(Files file);
 
+    @Query("SELECT * FROM files where fileUri = :fileUri")
+    Files queryFilesByFileUri(String fileUri);
+
     @Query("DELETE FROM files WHERE id = :id")
     void deleteById(int id);
 
@@ -67,7 +70,7 @@ public interface FilesDao {
     @Query("SELECT * FROM files")
     List<Files> getAllFiles();
 
-//    -----------------getALLFilesSortBy---------------------
+    //    -----------------getALLFilesSortBy---------------------
     @Query("SELECT * FROM files ORDER BY fileName ASC")
     List<Files> getALLFilesSortByFileNameAscending();
 
@@ -91,6 +94,7 @@ public interface FilesDao {
 
     @Query("SELECT * FROM files ORDER BY fileSize DESC")
     List<Files> getALLFilesSortByFileSizeDescending();
+
     //    -----------------getPPTFilesSortBy---------------------
     @Query("SELECT * FROM files WHERE fileType = 'PPT' ORDER BY fileName ASC")
     List<Files> getPPTFilesSortByFileNameAscending();
@@ -259,4 +263,12 @@ public interface FilesDao {
     @Query("SELECT * FROM files WHERE fileType = 'OTHER'")
     List<Files> getOtherFiles();
 
+    @Query("UPDATE files SET fileName = :fileName, fileSize = :sizeLong, fileType = :fileType, " +
+            "createdTime = :dateAddedLong, changedTime = :dateModifiedLong, " +
+            "isDelete = :isDelete WHERE fileUri = :pathStr")
+    void update(String fileName, String pathStr, long sizeLong,
+                String fileType, long dateAddedLong, long dateModifiedLong, boolean isDelete);
+
+    @Query("DELETE FROM files WHERE isDelete = :isDelete")
+    void delete(boolean isDelete);
 }

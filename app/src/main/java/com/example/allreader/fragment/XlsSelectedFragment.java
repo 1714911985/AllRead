@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,12 @@ import com.example.allreader.room.entity.Files;
 import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.RecycleListAdapter;
+import com.example.allreader.utils.entity.EventMessage;
+import com.example.allreader.utils.util.EventBusUtils;
 import com.example.allreader.utils.util.QueryMethodUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +39,7 @@ public class XlsSelectedFragment extends Fragment {
     private FilesDao filesDao;
     private AppDatabase appDatabase;
     private List<Files> filesList;
+    private RecycleListAdapter recycleListAdapter;
 
 
     @Override
@@ -57,7 +64,7 @@ public class XlsSelectedFragment extends Fragment {
         int orderMethodId = MMKVManager.getInt("orderMethodId", R.id.bdrb_desc);
 
         List<Files> initialFileList = new ArrayList<>();
-        RecycleListAdapter recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
+        recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
         if (viewMethodId == R.id.bdrb_list) {
             rvXlsSelected.setAdapter(recycleListAdapter);
         } else {
@@ -66,11 +73,17 @@ public class XlsSelectedFragment extends Fragment {
 
         rvXlsSelected.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        updateAdapter(sortMethodId,orderMethodId);
+    }
+
+    private void updateAdapter(int sortMethodId, int orderMethodId) {
         ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
             @Override
             public void run() {
+                long currentTimeMillis = System.currentTimeMillis();
                 filesList = QueryMethodUtils.chooseQueryMethod(filesDao, "XLS", sortMethodId, orderMethodId);
 
+                Log.e("getAllFilesSortedByCreatedTimeDescending", System.currentTimeMillis() - currentTimeMillis + "");
                 // 在主线程更新 UI
                 rvXlsSelected.post(new Runnable() {
                     @Override
@@ -85,5 +98,22 @@ public class XlsSelectedFragment extends Fragment {
                 });
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void messageEventBus(EventMessage message) {
+        updateAdapter(message.getSortMethodId(), message.getOrderMethodId());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBusUtils.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBusUtils.unregister(this);
     }
 }

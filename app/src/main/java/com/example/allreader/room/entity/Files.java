@@ -22,11 +22,13 @@ public class Files {
     private long latestTime;//最近点击时间
     private int isCollected;//是否收藏  0没有   1收藏
 
+    private boolean isDelete;//判断删除字段
+
     public Files() {
     }
 
     @Ignore
-    public Files(String fileName, String fileUri, long fileSize, String fileType, long createdTime, long changedTime, long latestTime, int isCollected) {
+    public Files(String fileName, String fileUri, long fileSize, String fileType, long createdTime, long changedTime, long latestTime, int isCollected, boolean isDelete) {
         this.fileName = fileName;
         this.fileUri = fileUri;
         this.fileSize = fileSize;
@@ -35,6 +37,7 @@ public class Files {
         this.changedTime = changedTime;
         this.latestTime = latestTime;
         this.isCollected = isCollected;
+        this.isDelete = isDelete;
     }
 
     public int getId() {
@@ -109,8 +112,16 @@ public class Files {
         this.isCollected = isCollected;
     }
 
-    @Override
+    public boolean isDelete() {
+        return isDelete;
+    }
+
+    public void setDelete(boolean delete) {
+        isDelete = delete;
+    }
+
     @Ignore
+    @Override
     public String toString() {
         return "Files{" +
                 "id=" + id +
@@ -122,6 +133,7 @@ public class Files {
                 ", changedTime=" + changedTime +
                 ", latestTime=" + latestTime +
                 ", isCollected=" + isCollected +
+                ", isDelete=" + isDelete +
                 '}';
     }
 }

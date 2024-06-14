@@ -41,6 +41,9 @@ import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.observer.ScreenshotObserver;
 import com.example.allreader.utils.util.FileUtils;
+import com.tencent.mmkv.MMKV;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_WRITE_EXTERNAL_STORAGE = 12;
     private FilesDao filesDao;
     private AppDatabase appDatabase;
+    private boolean isDelete;//判断哪些数据是在两次扫描之间已经被删除过的
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -265,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
                 if (cursor != null) {
                     int count = cursor.getCount();
                     if (count > 0) {
-                        filesDao.deleteAll();
                         //扫描有结果
                         int columnIndexOfData = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA);
                         int columnIndexOfDateModified = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED);
@@ -281,11 +284,19 @@ public class MainActivity extends AppCompatActivity {
                             int index = pathStr.lastIndexOf('/');
                             String fileName = pathStr.substring(index + 1).toLowerCase();
                             String fileType = FileUtils.getFileType(fileName);
-                            Files files = new Files(fileName, pathStr, sizeLong, fileType, dateAddedLong, dateModifiedLong, 0, 0);
-                            filesDao.insert(files);
+                            isDelete = !MMKVManager.getBoolean("isDelete", false);
+                            Files queryFilesByFileUri = filesDao.queryFilesByFileUri(pathStr);
+                            if (!Objects.isNull(queryFilesByFileUri)) {
+                                filesDao.update(fileName, pathStr, sizeLong, fileType, dateAddedLong, dateModifiedLong, !isDelete);
+                            } else {
+                                Files files = new Files(fileName, pathStr, sizeLong, fileType, dateAddedLong, dateModifiedLong, 0L, 0, !isDelete);
+                                filesDao.insert(files);
+                            }
                         }
                     }
                 }
+                filesDao.delete(isDelete);
+                MMKVManager.putBoolean("isDelete", !isDelete);
                 sendBroadcast(new Intent("com.example.allreader.ACTION_SCAN_FINISHED"));
             }
         });

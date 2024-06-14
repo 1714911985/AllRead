@@ -33,4 +33,12 @@ public class MMKVManager {
         return mmkv.decodeString(key, defaultValue);
     }
 
+    public static boolean putBoolean(String key, boolean value) {
+        return mmkv.encode(key, value);
+    }
+
+    public static boolean getBoolean(String key, boolean defaultValue) {
+        return mmkv.decodeBool(key, defaultValue);
+    }
+
 }

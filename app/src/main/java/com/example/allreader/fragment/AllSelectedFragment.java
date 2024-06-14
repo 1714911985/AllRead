@@ -22,7 +22,12 @@ import com.example.allreader.room.entity.Files;
 import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.RecycleListAdapter;
+import com.example.allreader.utils.entity.EventMessage;
+import com.example.allreader.utils.util.EventBusUtils;
 import com.example.allreader.utils.util.QueryMethodUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,6 +41,7 @@ public class AllSelectedFragment extends Fragment {
     private FilesDao filesDao;
     private AppDatabase appDatabase;
     private List<Files> filesList;
+    private RecycleListAdapter recycleListAdapter;
 
 
     @Override
@@ -60,22 +66,26 @@ public class AllSelectedFragment extends Fragment {
         int orderMethodId = MMKVManager.getInt("orderMethodId", R.id.bdrb_desc);
 
         List<Files> initialFileList = new ArrayList<>();
-        RecycleListAdapter recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
-        if (viewMethodId == R.id.bdrb_list){
+        recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
+        if (viewMethodId == R.id.bdrb_list) {
             rvAllSelected.setAdapter(recycleListAdapter);
-        }else {
+        } else {
             //grid
         }
 
         rvAllSelected.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        updateAdapter(sortMethodId, orderMethodId);
+    }
+
+    private void updateAdapter(int sortMethodId, int orderMethodId) {
         ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 long currentTimeMillis = System.currentTimeMillis();
-                filesList = QueryMethodUtils.chooseQueryMethod(filesDao,"ALL",sortMethodId,orderMethodId);
+                filesList = QueryMethodUtils.chooseQueryMethod(filesDao, "ALL", sortMethodId, orderMethodId);
 
-                Log.e("getAllFilesSortedByCreatedTimeDescending", System.currentTimeMillis()-currentTimeMillis+"" );
+                Log.e("getAllFilesSortedByCreatedTimeDescending", System.currentTimeMillis() - currentTimeMillis + "");
                 // 在主线程更新 UI
                 rvAllSelected.post(new Runnable() {
                     @Override
@@ -90,5 +100,22 @@ public class AllSelectedFragment extends Fragment {
                 });
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void messageEventBus(EventMessage message) {
+        updateAdapter(message.getSortMethodId(), message.getOrderMethodId());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBusUtils.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBusUtils.unregister(this);
     }
 }
