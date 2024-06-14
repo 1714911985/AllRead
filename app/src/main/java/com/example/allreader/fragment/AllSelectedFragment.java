@@ -19,10 +19,13 @@ import com.example.allreader.room.dao.FilesDao;
 import com.example.allreader.room.dao.FilesDao_Impl;
 import com.example.allreader.room.database.AppDatabase;
 import com.example.allreader.room.entity.Files;
+import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.RecycleListAdapter;
+import com.example.allreader.utils.util.QueryMethodUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -52,9 +55,17 @@ public class AllSelectedFragment extends Fragment {
         nsvAllSelectedNoResult = view.findViewById(R.id.nsv_all_selected_no_result);
 
         // 初始化适配器并设置到 RecyclerView
+        int viewMethodId = MMKVManager.getInt("viewMethodId", R.id.bdrb_list);
+        int sortMethodId = MMKVManager.getInt("sortMethodId", R.id.bdrb_date);
+        int orderMethodId = MMKVManager.getInt("orderMethodId", R.id.bdrb_desc);
+
         List<Files> initialFileList = new ArrayList<>();
         RecycleListAdapter recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
-        rvAllSelected.setAdapter(recycleListAdapter);
+        if (viewMethodId == R.id.bdrb_list){
+            rvAllSelected.setAdapter(recycleListAdapter);
+        }else {
+            //grid
+        }
 
         rvAllSelected.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -62,7 +73,8 @@ public class AllSelectedFragment extends Fragment {
             @Override
             public void run() {
                 long currentTimeMillis = System.currentTimeMillis();
-                filesList = filesDao.getAllFilesSortedByCreatedTimeDescending();
+                filesList = QueryMethodUtils.chooseQueryMethod(filesDao,"ALL",sortMethodId,orderMethodId);
+
                 Log.e("getAllFilesSortedByCreatedTimeDescending", System.currentTimeMillis()-currentTimeMillis+"" );
                 // 在主线程更新 UI
                 rvAllSelected.post(new Runnable() {
@@ -78,7 +90,5 @@ public class AllSelectedFragment extends Fragment {
                 });
             }
         });
-
-
     }
 }

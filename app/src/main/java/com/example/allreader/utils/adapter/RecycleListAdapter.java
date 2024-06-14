@@ -16,6 +16,7 @@ import com.example.allreader.room.entity.Files;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -28,12 +29,14 @@ import java.util.Locale;
 public class RecycleListAdapter extends RecyclerView.Adapter<RecycleListAdapter.ViewHolder> {
     private static int isFavorite;
     private List<Files> filesList;
+    private List<Files> filteredList;
     private FilesDao filesDao;
     private Files thisFiles;
 
     public RecycleListAdapter(List<Files> filesList, FilesDao filesDao) {
         this.filesList = filesList;
         this.filesDao = filesDao;
+        filteredList = new ArrayList<>(filesList);
     }
 
     public void updateData(List<Files> newFilesList) {
@@ -139,6 +142,7 @@ public class RecycleListAdapter extends RecyclerView.Adapter<RecycleListAdapter.
         @SuppressLint("DefaultLocale") String size = String.format("%.1f %sB", fileSize / Math.pow(1024, exp), unit);
         return time + " | " + size;
     }
+
 
     @Override
     public int getItemCount() {

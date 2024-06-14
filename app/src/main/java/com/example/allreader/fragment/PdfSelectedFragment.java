@@ -19,8 +19,10 @@ import com.example.allreader.room.dao.FilesDao;
 import com.example.allreader.room.dao.FilesDao_Impl;
 import com.example.allreader.room.database.AppDatabase;
 import com.example.allreader.room.entity.Files;
+import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.RecycleListAdapter;
+import com.example.allreader.utils.util.QueryMethodUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,16 +51,25 @@ public class PdfSelectedFragment extends Fragment {
         nsvPdfSelectedNoResult = view.findViewById(R.id.nsv_pdf_selected_no_result);
 
         // 初始化适配器并设置到 RecyclerView
+        int viewMethodId = MMKVManager.getInt("viewMethodId", R.id.bdrb_list);
+        int sortMethodId = MMKVManager.getInt("sortMethodId", R.id.bdrb_date);
+        int orderMethodId = MMKVManager.getInt("orderMethodId", R.id.bdrb_desc);
+
         List<Files> initialFileList = new ArrayList<>();
         RecycleListAdapter recycleListAdapter = new RecycleListAdapter(initialFileList, filesDao);
-        rvPdfSelected.setAdapter(recycleListAdapter);
+        if (viewMethodId == R.id.bdrb_list) {
+            rvPdfSelected.setAdapter(recycleListAdapter);
+        } else {
+            //grid
+        }
 
         rvPdfSelected.setLayoutManager(new LinearLayoutManager(getContext()));
 
         ThreadPoolManager.getSingleExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                filesList = filesDao.getPDFFilesSortedByCreatedTimeDescending();
+                filesList = QueryMethodUtils.chooseQueryMethod(filesDao, "PDF", sortMethodId, orderMethodId);
+
                 // 在主线程更新 UI
                 rvPdfSelected.post(new Runnable() {
                     @Override
@@ -73,7 +84,5 @@ public class PdfSelectedFragment extends Fragment {
                 });
             }
         });
-
-
     }
 }

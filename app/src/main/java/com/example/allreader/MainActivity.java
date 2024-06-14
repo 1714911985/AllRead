@@ -37,6 +37,7 @@ import com.example.allreader.room.dao.FilesDao;
 import com.example.allreader.room.dao.FilesDao_Impl;
 import com.example.allreader.room.database.AppDatabase;
 import com.example.allreader.room.entity.Files;
+import com.example.allreader.utils.Manager.MMKVManager;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.observer.ScreenshotObserver;
 import com.example.allreader.utils.util.FileUtils;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         initData();
+        MMKVManager.initialize(context);
 
         createNotificationChannel();//创建通知渠道
         sendNotification();// 发送通知

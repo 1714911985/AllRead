@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
@@ -17,12 +18,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.allreader.R;
 import com.example.allreader.utils.adapter.ClassificationDisplayAdapter;
+import com.example.allreader.utils.custom_view.ButtomDialogRadioGroup;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.tencent.mmkv.MMKV;
 
 public class ClassificationDisplayFragment extends Fragment {
     private NavController navController;
@@ -30,10 +35,12 @@ public class ClassificationDisplayFragment extends Fragment {
     private TabLayout tlyClassificationDisplay;
     private ViewPager2 vp2ClassificationDisplay;
     private int position;
+    private MMKV mmkv;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_classification_display, container, false);
     }
@@ -41,6 +48,9 @@ public class ClassificationDisplayFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.e("TAG", "onCreateView: aaaaaaaaaaaaaaa");
+        MMKV.initialize(requireActivity());
+        mmkv = MMKV.defaultMMKV();
         Bundle bundle = getArguments();
         position = bundle.getInt("position", 0);
         navController = Navigation.findNavController(view);
@@ -51,13 +61,6 @@ public class ClassificationDisplayFragment extends Fragment {
         setToolBarButton();
         setViewPager2();
         setTabLayout();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-
     }
 
     private void setViewPager2() {
@@ -91,8 +94,42 @@ public class ClassificationDisplayFragment extends Fragment {
     }
 
     private void showBottomDialog(Context context) {
+
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-        bottomSheetDialog.setContentView(getLayoutInflater().inflate(R.layout.dialog_bottom_arrangement, null));
+        View view = getLayoutInflater().inflate(R.layout.dialog_bottom_arrangement, null);
+        bottomSheetDialog.setContentView(view);
+        int viewMethodId = mmkv.decodeInt("viewMethodId", R.id.bdrb_list);
+        int sortMethodId = mmkv.decodeInt("sortMethodId", R.id.bdrb_date);
+        int orderMethodId = mmkv.decodeInt("orderMethodId", R.id.bdrb_desc);
+        ButtomDialogRadioGroup bdrgViewMethod = view.findViewById(R.id.bdrg_view_method);
+        ButtomDialogRadioGroup bdrgSortMethod = view.findViewById(R.id.bdrg_sort_method);
+        ButtomDialogRadioGroup bdrgOrderMethod = view.findViewById(R.id.bdrg_order_method);
+        bdrgViewMethod.check(view.findViewById(viewMethodId));
+        bdrgSortMethod.check(view.findViewById(sortMethodId));
+        bdrgOrderMethod.check(view.findViewById(orderMethodId));
+        Button btnBottomDialogApply = view.findViewById(R.id.btn_bottom_dialog_apply);
+
+        ImageView ivBottomDialogCancel = view.findViewById(R.id.iv_bottom_dialog_cancel);
+        ivBottomDialogCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        btnBottomDialogApply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int viewMethodId = bdrgViewMethod.getChecked().getId();
+                int sortMethodId = bdrgSortMethod.getChecked().getId();
+                int orderMethodId = bdrgOrderMethod.getChecked().getId();
+                mmkv.encode("viewMethodId",viewMethodId);
+                mmkv.encode("sortMethodId",sortMethodId);
+                mmkv.encode("orderMethodId",orderMethodId);
+                //刷新
+                bottomSheetDialog.dismiss();
+            }
+        });
         bottomSheetDialog.show();
     }
 
@@ -168,7 +205,6 @@ public class ClassificationDisplayFragment extends Fragment {
         tlyClassificationDisplay.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                Log.d("ldl", "tab222:" + tab.getText() + ", position:" + tab.getPosition());
                 setToolBarTitle(tab.getPosition());
             }
 
