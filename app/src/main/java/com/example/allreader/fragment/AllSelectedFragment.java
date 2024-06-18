@@ -79,7 +79,7 @@ public class AllSelectedFragment extends Fragment {
             //grid
             recycleGridAdapter = new RecycleGridAdapter(requireActivity(), initialFileList, filesDao);
             rvAllSelected.setAdapter(recycleGridAdapter);
-            rvAllSelected.setLayoutManager(new GridLayoutManager(requireActivity(), 3));
+            rvAllSelected.setLayoutManager(new GridLayoutManager(requireActivity(), 2));
         }
 
 
@@ -99,9 +99,9 @@ public class AllSelectedFragment extends Fragment {
                             if (originViewMethodId == R.id.bdrb_list) {
                                 recycleGridAdapter = new RecycleGridAdapter(requireActivity(), filesList, filesDao);
                                 rvAllSelected.setAdapter(recycleGridAdapter);
-                                rvAllSelected.setLayoutManager(new GridLayoutManager(requireActivity(), 3));
+                                rvAllSelected.setLayoutManager(new GridLayoutManager(requireActivity(), 2));
                             } else {
-                                rvAllSelected.setLayoutManager(new GridLayoutManager(requireActivity(), 3)); // 确保布局管理器被设置
+                                rvAllSelected.setLayoutManager(new GridLayoutManager(requireActivity(), 2)); // 确保布局管理器被设置
                                 recycleGridAdapter.updateData(filesList);
                             }
                         } else {

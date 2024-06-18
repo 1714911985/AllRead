@@ -165,6 +165,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         setGridView();
+        refresh();
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -365,11 +366,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         gvClassification.setAdapter(adapter);
     }
 
-    private void updateSecondLine(int position, int fileNum) {
-        GridItem item = (GridItem) adapter.getItem(position);
-        item.setText2(fileNum + " " + getResources().getText(R.string.file));
-        adapter.notifyDataSetChanged();
-    }
 
     private List<GridItem> generateItems() {
         List<GridItem> gridItemList = new ArrayList<>();
