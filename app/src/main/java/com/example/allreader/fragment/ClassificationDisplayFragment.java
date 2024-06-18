@@ -2,17 +2,6 @@ package com.example.allreader.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.NavOptions;
-import androidx.navigation.Navigation;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,6 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.allreader.R;
 import com.example.allreader.utils.adapter.ClassificationDisplayAdapter;
@@ -50,7 +48,6 @@ public class ClassificationDisplayFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e("TAG", "onCreateView: aaaaaaaaaaaaaaa");
         MMKV.initialize(requireActivity());
         mmkv = MMKV.defaultMMKV();
         Bundle bundle = getArguments();
@@ -130,7 +127,7 @@ public class ClassificationDisplayFragment extends Fragment {
                 mmkv.encode("sortMethodId",sortMethodId);
                 mmkv.encode("orderMethodId",orderMethodId);
                 //刷新
-                EventBusUtils.post(new EventMessage(sortMethodId,orderMethodId));
+                EventBusUtils.post(new EventMessage(viewMethodId,sortMethodId,orderMethodId));
                 bottomSheetDialog.dismiss();
             }
         });

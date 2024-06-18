@@ -26,4 +26,12 @@
     <color name="bottomDialogBackgroundColor">#3fB0C4DE</color>
     <color name="notSelectedColor">#adb7c9</color>
 
+    <color name="otherBackgroundColor">#5f8597b5</color>
+    <color name="pptBackgroundColor">#5fff762d</color>
+    <color name="txtBackgroundColor">#5f43baff</color>
+    <color name="xlsBackgroundColor">#5f07ca4a</color>
+    <color name="pdfBackgroundColor">#5fff212c</color>
+    <color name="docBackgroundColor">#5f1a73e8</color>
+
+    <color name="recycle_grid_bg_color">#ffffff</color>
 </resources>

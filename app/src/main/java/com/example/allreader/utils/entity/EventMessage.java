@@ -6,12 +6,22 @@ package com.example.allreader.utils.entity;
  * Description: com.example.allreader.utils.entity.EventMessage
  */
 public class EventMessage {
+    private int viewMethodId;
     private int sortMethodId;
     private int orderMethodId;
 
-    public EventMessage(int sortMethodId, int orderMethodId) {
+    public EventMessage(int viewMethodId, int sortMethodId, int orderMethodId) {
+        this.viewMethodId = viewMethodId;
         this.sortMethodId = sortMethodId;
         this.orderMethodId = orderMethodId;
+    }
+
+    public int getViewMethodId() {
+        return viewMethodId;
+    }
+
+    public void setViewMethodId(int viewMethodId) {
+        this.viewMethodId = viewMethodId;
     }
 
     public int getSortMethodId() {

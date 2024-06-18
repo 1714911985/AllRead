@@ -3,30 +3,26 @@ package com.example.allreader.fragment;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,11 +43,14 @@ import com.example.allreader.R;
 import com.example.allreader.room.dao.FilesDao;
 import com.example.allreader.room.dao.FilesDao_Impl;
 import com.example.allreader.room.database.AppDatabase;
-import com.example.allreader.room.database.AppDatabase_Impl;
 import com.example.allreader.utils.Manager.ThreadPoolManager;
 import com.example.allreader.utils.adapter.CollectAdapter;
 import com.example.allreader.utils.adapter.GridAdapter;
+import com.example.allreader.utils.custom_view.ButtomDialogRadioGroup;
+import com.example.allreader.utils.entity.EventMessage;
 import com.example.allreader.utils.entity.GridItem;
+import com.example.allreader.utils.util.EventBusUtils;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -60,10 +59,10 @@ import com.tencent.mmkv.MMKV;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class MainFragment extends Fragment implements View.OnClickListener {
     private DrawerLayout dlyMain;
+    private ImageButton ivRefresh, ivSortNormal;
     private Toolbar tbMain;
     private GridView gvClassification;
     private GridAdapter adapter;
@@ -125,6 +124,28 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        dlyMain = view.findViewById(R.id.dly_main);
+        tbMain = view.findViewById(R.id.tb_main);
+        gvClassification = view.findViewById(R.id.gv_classification);
+        tlyCollect = view.findViewById(R.id.tly_collect);
+        vp2Collect = view.findViewById(R.id.vp2_collect);
+        ngvDrawer = view.findViewById(R.id.ngv_drawer);
+        ivRefresh = view.findViewById(R.id.iv_refresh);
+        ivSortNormal = view.findViewById(R.id.iv_sort_normal);
+        ivRefresh.setOnClickListener(this);
+        ivSortNormal.setOnClickListener(this);
+
+        navController = Navigation.findNavController(view);
+        MMKV.initialize(requireActivity());
+        mmkv = MMKV.defaultMMKV();
+        appDatabase = AppDatabase.getInstance(getContext());
+        filesDao = new FilesDao_Impl(appDatabase);
+
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -140,6 +161,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        setGridView();
+    }
+
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private void initData() {
         IntentFilter filter = new IntentFilter("com.example.allreader.ACTION_SCAN_FINISHED");
@@ -147,29 +174,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        setGridView();
-    }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        dlyMain = view.findViewById(R.id.dly_main);
-        tbMain = view.findViewById(R.id.tb_main);
-        gvClassification = view.findViewById(R.id.gv_classification);
-        tlyCollect = view.findViewById(R.id.tly_collect);
-        vp2Collect = view.findViewById(R.id.vp2_collect);
-        ngvDrawer = view.findViewById(R.id.ngv_drawer);
 
-        navController = Navigation.findNavController(view);
-        MMKV.initialize(requireActivity());
-        mmkv = MMKV.defaultMMKV();
-        appDatabase = AppDatabase.getInstance(getContext());
-        filesDao = new FilesDao_Impl(appDatabase);
 
-    }
 
     private void initFragment() {
         //设置主题模式
@@ -436,7 +443,59 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         } else if (v.getId() == R.id.btn_rate_now) {
             Toast.makeText(requireActivity(), getResources().getText(R.string.thankForYourRate), Toast.LENGTH_SHORT).show();
             dlRateUs.dismiss();
+        }else if (v.getId() == R.id.iv_refresh){
+            refresh();
+        }else if (v.getId() == R.id.iv_sort_normal){
+            showBottomDialog(requireActivity());
         }
+    }
+
+    private void refresh() {
+        int viewMethodId = mmkv.decodeInt("viewMethodId", R.id.bdrb_list);
+        int sortMethodId = mmkv.decodeInt("sortMethodId", R.id.bdrb_date);
+        int orderMethodId = mmkv.decodeInt("orderMethodId", R.id.bdrb_desc);
+        //刷新
+        EventBusUtils.post(new EventMessage(viewMethodId,sortMethodId,orderMethodId));
+    }
+
+    private void showBottomDialog(Context context) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
+        View view = getLayoutInflater().inflate(R.layout.dialog_bottom_arrangement, null);
+        bottomSheetDialog.setContentView(view);
+        int viewMethodId = mmkv.decodeInt("viewMethodId", R.id.bdrb_list);
+        int sortMethodId = mmkv.decodeInt("sortMethodId", R.id.bdrb_date);
+        int orderMethodId = mmkv.decodeInt("orderMethodId", R.id.bdrb_desc);
+        ButtomDialogRadioGroup bdrgViewMethod = view.findViewById(R.id.bdrg_view_method);
+        ButtomDialogRadioGroup bdrgSortMethod = view.findViewById(R.id.bdrg_sort_method);
+        ButtomDialogRadioGroup bdrgOrderMethod = view.findViewById(R.id.bdrg_order_method);
+        bdrgViewMethod.check(view.findViewById(viewMethodId));
+        bdrgSortMethod.check(view.findViewById(sortMethodId));
+        bdrgOrderMethod.check(view.findViewById(orderMethodId));
+        Button btnBottomDialogApply = view.findViewById(R.id.btn_bottom_dialog_apply);
+
+        ImageView ivBottomDialogCancel = view.findViewById(R.id.iv_bottom_dialog_cancel);
+        ivBottomDialogCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        btnBottomDialogApply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int viewMethodId = bdrgViewMethod.getChecked().getId();
+                int sortMethodId = bdrgSortMethod.getChecked().getId();
+                int orderMethodId = bdrgOrderMethod.getChecked().getId();
+                mmkv.encode("viewMethodId",viewMethodId);
+                mmkv.encode("sortMethodId",sortMethodId);
+                mmkv.encode("orderMethodId",orderMethodId);
+                //刷新
+                EventBusUtils.post(new EventMessage(viewMethodId,sortMethodId,orderMethodId));
+                bottomSheetDialog.dismiss();
+            }
+        });
+        bottomSheetDialog.show();
     }
 
     @Override

@@ -245,6 +245,56 @@ public interface FilesDao {
     @Query("SELECT * FROM files WHERE fileType = 'OTHER' ORDER BY fileSize DESC")
     List<Files> getOTHERFilesSortByFileSizeDescending();
 
+    //    -----------------getIsFavoriteFilesSortBy---------------------
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY fileName ASC")
+    List<Files> getFavoriteFilesSortByFileNameAscending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY fileName DESC")
+    List<Files> getFavoriteFilesSortByFileNameDescending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY createdTime ASC")
+    List<Files> getFavoriteFilesSortByCreatedTimeAscending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY createdTime DESC")
+    List<Files> getFavoriteFilesSortByCreatedTimeDescending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY fileType ASC")
+    List<Files> getFavoriteFilesSortByFileTypeAscending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY fileType DESC")
+    List<Files> getFavoriteFilesSortByFileTypeDescending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY fileSize ASC")
+    List<Files> getFavoriteFilesSortByFileSizeAscending();
+
+    @Query("SELECT * FROM files WHERE isCollected = 1 ORDER BY fileSize DESC")
+    List<Files> getFavoriteFilesSortByFileSizeDescending();
+
+    //    -----------------getRecentFilesSortBy---------------------
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY fileName ASC")
+    List<Files> getRecentFilesSortByFileNameAscending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY fileName DESC")
+    List<Files> getRecentFilesSortByFileNameDescending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY createdTime ASC")
+    List<Files> getRecentFilesSortByCreatedTimeAscending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY createdTime DESC")
+    List<Files> getRecentFilesSortByCreatedTimeDescending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY fileType ASC")
+    List<Files> getRecentFilesSortByFileTypeAscending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY fileType DESC")
+    List<Files> getRecentFilesSortByFileTypeDescending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY fileSize ASC")
+    List<Files> getRecentFilesSortByFileSizeAscending();
+
+    @Query("SELECT * FROM files WHERE latestTime != 0 ORDER BY fileSize DESC")
+    List<Files> getRecentFilesSortByFileSizeDescending();
+
     @Query("SELECT * FROM files WHERE fileType = 'PDF'")
     List<Files> getPDFFiles();
 

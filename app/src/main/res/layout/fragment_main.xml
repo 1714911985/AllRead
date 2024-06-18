@@ -12,15 +12,26 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/tb_main"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:gravity="center"
-            app:menu="@menu/toolbar_menu"
-            app:title="   ALL DOCUMENT"
-            app:titleTextAppearance="@style/Toolbar.TitleText.Bold"
-            app:titleTextColor="@color/skyblue" />
+            android:layout_height="?attr/actionBarSize">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/all_document"
+                android:textColor="@color/skyblue"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tb_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                app:menu="@menu/toolbar_menu"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:layout_width="match_parent"
@@ -80,19 +91,25 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@id/tly_collect">
 
-                        <ImageView
+
+                        <ImageButton
+                            android:id="@+id/iv_refresh"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center"
                             android:layout_marginStart="80dp"
                             android:layout_marginEnd="30dp"
+                            android:background="@drawable/ripple_circle"
                             android:src="@drawable/ic_refresh" />
 
-                        <ImageView
+
+                        <ImageButton
+                            android:id="@+id/iv_sort_normal"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center"
                             android:layout_marginEnd="30dp"
+                            android:background="@drawable/ripple_circle"
                             android:src="@drawable/ic_sort_normal" />
 
                     </LinearLayout>

@@ -22,4 +22,13 @@
     <color name="colorPrimaryDarkNight">#0D47A1</color>
     <color name="colorAccentNight">#FF4081</color>
     <color name="bottomDialogBackgroundColor">#6f000000</color>
+
+    <color name="otherBackgroundColor">#131313</color>
+    <color name="pptBackgroundColor">#131313</color>
+    <color name="txtBackgroundColor">#131313</color>
+    <color name="xlsBackgroundColor">#131313</color>
+    <color name="pdfBackgroundColor">#131313</color>
+    <color name="docBackgroundColor">#131313</color>
+
+    <color name="recycle_grid_bg_color">#333333</color>
 </resources>

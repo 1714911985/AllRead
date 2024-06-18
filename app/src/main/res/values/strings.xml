@@ -66,4 +66,5 @@
     <string name="Asc">升序</string>
     <string name="Desc">降序</string>
     <string name="apply">提交</string>
+    <string name="all_document">ALL DOCUMENT</string>
 </resources>

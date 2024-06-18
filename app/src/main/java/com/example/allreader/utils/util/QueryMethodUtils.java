@@ -36,6 +36,12 @@ public class QueryMethodUtils {
             case "OTHER":
                 filesList = chooseOTHERQueryMethod(filesDao, sortMethodId, orderMethodId);
                 break;
+            case "FAVORITE":
+                filesList = chooseFavoriteQueryMethod(filesDao, sortMethodId, orderMethodId);
+                break;
+            case "RECENT":
+                filesList = chooseRecentQueryMethod(filesDao, sortMethodId, orderMethodId);
+                break;
         }
         return filesList;
     }
@@ -215,5 +221,54 @@ public class QueryMethodUtils {
         return null;
     }
 
+    private static List<Files> chooseRecentQueryMethod(FilesDao filesDao, int sortMethodId, int orderMethodId) {
+        if (orderMethodId == R.id.bdrb_asc) {
+            if (sortMethodId == R.id.bdrb_name) {
+                return filesDao.getRecentFilesSortByFileNameAscending();
+            } else if (sortMethodId == R.id.bdrb_date) {
+                return filesDao.getRecentFilesSortByCreatedTimeAscending();
+            } else if (sortMethodId == R.id.bdrb_type) {
+                return filesDao.getRecentFilesSortByFileTypeAscending();
+            } else if (sortMethodId == R.id.bdrb_size) {
+                return filesDao.getRecentFilesSortByFileSizeAscending();
+            }
+        } else if (orderMethodId == R.id.bdrb_desc) {
+            if (sortMethodId == R.id.bdrb_name) {
+                return filesDao.getRecentFilesSortByFileNameDescending();
+            } else if (sortMethodId == R.id.bdrb_date) {
+                return filesDao.getRecentFilesSortByCreatedTimeDescending();
+            } else if (sortMethodId == R.id.bdrb_type) {
+                return filesDao.getRecentFilesSortByFileTypeDescending();
+            } else if (sortMethodId == R.id.bdrb_size) {
+                return filesDao.getRecentFilesSortByFileSizeDescending();
+            }
+        }
+        return null;
+    }
+
+    private static List<Files> chooseFavoriteQueryMethod(FilesDao filesDao, int sortMethodId, int orderMethodId) {
+        if (orderMethodId == R.id.bdrb_asc) {
+            if (sortMethodId == R.id.bdrb_name) {
+                return filesDao.getFavoriteFilesSortByFileNameAscending();
+            } else if (sortMethodId == R.id.bdrb_date) {
+                return filesDao.getFavoriteFilesSortByCreatedTimeAscending();
+            } else if (sortMethodId == R.id.bdrb_type) {
+                return filesDao.getFavoriteFilesSortByFileTypeAscending();
+            } else if (sortMethodId == R.id.bdrb_size) {
+                return filesDao.getFavoriteFilesSortByFileSizeAscending();
+            }
+        } else if (orderMethodId == R.id.bdrb_desc) {
+            if (sortMethodId == R.id.bdrb_name) {
+                return filesDao.getFavoriteFilesSortByFileNameDescending();
+            } else if (sortMethodId == R.id.bdrb_date) {
+                return filesDao.getFavoriteFilesSortByCreatedTimeDescending();
+            } else if (sortMethodId == R.id.bdrb_type) {
+                return filesDao.getFavoriteFilesSortByFileTypeDescending();
+            } else if (sortMethodId == R.id.bdrb_size) {
+                return filesDao.getFavoriteFilesSortByFileSizeDescending();
+            }
+        }
+        return null;
+    }
 
 }
